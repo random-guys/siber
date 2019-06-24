@@ -1,5 +1,5 @@
 {
-  "name": "@random-guys/express",
+  "name": "@random-guys/siber",
   "version": "0.1.0",
   "description": "Wrapper around axios for interservice communication",
   "main": "dist/index.js",
@@ -12,16 +12,18 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/random-guys/express.git"
+    "url": "git+https://github.com/random-guys/siber.git"
   },
   "bugs": {
-    "url": "https://github.com/random-guys/express/issues"
+    "url": "https://github.com/random-guys/siber/issues"
   },
-  "homepage": "https://github.com/random-guys/express#readme",
+  "homepage": "https://github.com/random-guys/siber#readme",
   "devDependencies": {
+    "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/jest": "^24.0.14",
     "@types/lodash": "^4.14.134",
+    "@types/response-time": "^2.3.3",
     "@types/supertest": "^2.0.7",
     "jest": "^24.8.0",
     "supertest": "^4.0.2",
@@ -30,11 +32,13 @@
   },
   "dependencies": {
     "@random-guys/bucket": "^0.1.0",
-    "@random-guys/express-bunyan": "^0.1.0",
+    "@random-guys/express-bunyan": "^0.1.1",
     "@random-guys/express-jsend": "^0.1.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "http-status-codes": "^1.3.2",
     "inversify": "^5.0.1",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "response-time": "^2.3.2"
   }
 }

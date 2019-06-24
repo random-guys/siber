@@ -1,9 +1,9 @@
-# express
+# siber
 
 Controllers as classes..I really can't explain beyond this
 
 ## How to install?
-`yarn add @random-guys/express`
+`yarn add @random-guys/siber`
 
 Also, you need
 `yarn add inversify-express-utils`
@@ -41,6 +41,13 @@ export default container;
 Finally, in your `app.ts`
 ```ts
 const server = new InversifyExpressServer(container, null);
+.server.setConfig((app: Application) => {
+  app.use(...siber({
+    cors: false,
+    jsend: true,
+    tracking: true
+  }))
+})
 ```
 
 ## TODO
