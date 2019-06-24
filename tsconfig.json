@@ -18,6 +18,7 @@
     "strict": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "experimentalDecorators": true,
     "typeRoots": [
       "./node_modules/@types"
     ]
