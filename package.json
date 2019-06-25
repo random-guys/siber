@@ -1,6 +1,6 @@
 {
   "name": "@random-guys/siber",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Wrapper around axios for interservice communication",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/random-guys/siber#readme",
   "devDependencies": {
+    "@types/bunyan": "^1.8.6",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/jest": "^24.0.14",
@@ -32,7 +33,7 @@
   },
   "dependencies": {
     "@random-guys/bucket": "^0.1.0",
-    "@random-guys/express-bunyan": "^0.1.1",
+    "@random-guys/express-bunyan": "^0.2.0",
     "@random-guys/express-jsend": "^0.1.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
