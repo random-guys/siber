@@ -8,7 +8,7 @@ import { SiberConfig } from "./contracts";
 import { getConfig } from "./cors";
 
 
-export default function buildInto(app: Application, logger: Logger, conf: SiberConfig) {
+export function build(app: Application, logger: Logger, conf: SiberConfig) {
   // default middleware
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
