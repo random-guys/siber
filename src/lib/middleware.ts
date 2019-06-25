@@ -1,60 +1,32 @@
 import { ILogger, logRequest } from "@random-guys/express-bunyan";
 import { refreshJSend } from "@random-guys/express-jsend";
 import cors from "cors";
-import express, { RequestHandler } from "express";
+import express, { Application } from "express";
 import responseTime from "response-time";
+import { SiberConfig } from "./contracts";
+import { getConfig } from "./cors";
 
-export interface SiberConfig {
-  cors: boolean | CORSConfig
-  jsend: boolean
-  tracking: boolean
-}
 
-export interface CORSConfig {
-  cookies: boolean
-  source?: string
-  mode: 'dev' | 'prod'
-}
-
-export default function siber(logger: ILogger, conf: SiberConfig) {
+export default function buildInto(app: Application, logger: ILogger, conf: SiberConfig) {
   // default middleware
-  const middleware: any = [
-    express.json(),
-    express.urlencoded({ extended: false })
-  ]
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: false }))
 
-  // setup CORS
+  // CORS
   if (conf.cors) {
-    if (typeof conf.cors === 'boolean') {
-      conf.cors = { cookies: false, mode: 'dev' }
-    }
-    middleware.push(createCORSMiddleware(conf.cors))
+    const corsConfig = getConfig(conf.cors)
+    app.use(cors(corsConfig))
+    app.options('*', cors(corsConfig))
   }
 
-  // setup logging and metrics
+  // logging and metrics
   if (conf.tracking) {
-    middleware.unshift(
-      logRequest(logger),
-      responseTime()
-    )
+    app.use(logRequest(logger))
+    app.use(responseTime())
   }
 
-  // setup jsend
+  // jsend standard
   if (conf.jsend) {
-    middleware.unshift(refreshJSend)
+    app.use(refreshJSend)
   }
-  return middleware
-}
-
-function createCORSMiddleware(config: CORSConfig) {
-  const origin = config.mode === 'dev' ? true : config.source
-  const corsConf = { origin, credentials: config.cookies }
-  const m = cors(corsConf)
-  const options: RequestHandler = (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      return m(req, res, next)
-    }
-    next()
-  }
-  return [m, options]
 }

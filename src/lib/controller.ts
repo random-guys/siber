@@ -6,7 +6,7 @@ import HttpStatus from 'http-status-codes';
 import { injectable, unmanaged } from 'inversify';
 import pick from 'lodash/pick';
 import { ConstraintDataError } from './errors';
-import { PaginationOptions } from './types';
+import { PaginationOptions } from './contracts';
 
 
 @injectable()

@@ -42,11 +42,11 @@ Finally, in your `app.ts`
 ```ts
 const server = new InversifyExpressServer(container, null);
 .server.setConfig((app: Application) => {
-  app.use(...siber({
+  siber.buildInto(app, logger, {
     cors: false,
     jsend: true,
     tracking: true
-  }))
+  })
 })
 ```
 
