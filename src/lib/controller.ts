@@ -1,18 +1,19 @@
-import { DuplicateModelError, ModelNotFoundError } from '@random-guys/bucket';
-import { ILogger } from '@random-guys/express-bunyan';
-import '@random-guys/express-jsend'; // jSend type def
-import { Request, Response } from 'express';
-import HttpStatus from 'http-status-codes';
-import { injectable, unmanaged } from 'inversify';
-import pick from 'lodash/pick';
-import { ConstraintDataError } from './errors';
-import { PaginationOptions } from './contracts';
+import { DuplicateModelError, ModelNotFoundError } from "@random-guys/bucket";
+import { logError, logResponse } from "@random-guys/express-bunyan";
+import "@random-guys/express-jsend"; // jSend type def
+import Logger from "bunyan";
+import { Request, Response } from "express";
+import HttpStatus from "http-status-codes";
+import { injectable, unmanaged } from "inversify";
+import pick from "lodash/pick";
+import { PaginationOptions } from "./contracts";
+import { ConstraintDataError } from "./errors";
 
 
 @injectable()
 export class Controller<T> {
 
-  constructor(@unmanaged() private readonly logger: ILogger) { }
+  constructor(@unmanaged() private logger: Logger) { }
 
   /**
    * Determines the HTTP status code of an error
@@ -54,7 +55,7 @@ export class Controller<T> {
    */
   handleSuccess(req: Request, res: Response, data: T) {
     res.jSend.success(data);
-    this.logger.logAPIResponse(req, res);
+    logResponse(this.logger, req, res);
   }
 
   /**
@@ -73,7 +74,7 @@ export class Controller<T> {
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
-    this.logger.logAPIError(req, res, err);
+    logError(this.logger, err, req, res);
   }
 
   /**
