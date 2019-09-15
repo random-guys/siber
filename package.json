@@ -41,5 +41,8 @@
     "inversify": "^5.0.1",
     "lodash": "^4.17.11",
     "response-time": "^2.3.2"
-  }
+  },
+  "files": [
+    "dist/"
+  ]
 }
