@@ -10,6 +10,7 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
   // default middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+  app.use(refreshJSend);
 
   // CORS
   if (conf.cors) {
@@ -22,11 +23,6 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
 
     app.use(cors(conf.cors));
     app.options('*', cors(conf.cors));
-  }
-
-  // jsend standard
-  if (conf.jsend) {
-    app.use(refreshJSend);
   }
 
   // logging and metrics

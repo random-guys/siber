@@ -8,6 +8,5 @@ export type PaginationOptions = Pick<
 
 export interface SiberConfig {
   cors: boolean | CorsOptions;
-  jsend: boolean;
   tracking: boolean;
 }
