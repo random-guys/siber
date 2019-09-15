@@ -1,18 +1,12 @@
-import { Query } from "@random-guys/bucket";
+import { Query } from '@random-guys/bucket';
+import { CorsOptions } from 'cors';
 
 export type PaginationOptions = Pick<
   Query,
   Exclude<keyof Query, 'conditions' | 'archived'>
->
+>;
 
 export interface SiberConfig {
-  cors: boolean | CORSConfig
-  jsend: boolean
-  tracking: boolean
-}
-
-export interface CORSConfig {
-  cookies: boolean
-  source?: string
-  mode: 'dev' | 'prod'
+  cors: boolean | CorsOptions;
+  tracking: boolean;
 }
