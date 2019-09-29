@@ -11,6 +11,7 @@ import HttpStatus from 'http-status-codes';
 import { injectable, unmanaged } from 'inversify';
 import pick from 'lodash/pick';
 import { ConstraintDataError } from './errors';
+import { IrisAPIError } from '@random-guys/iris';
 
 @injectable()
 export class Controller<T> {
@@ -26,6 +27,7 @@ export class Controller<T> {
       return err.code;
     if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
     if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
+    if (err instanceof IrisAPIError) return err.data.code;
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
@@ -72,6 +74,11 @@ export class Controller<T> {
 
     if (err instanceof ConstraintDataError) {
       data = err.data;
+    }
+
+    if (err instanceof IrisAPIError) {
+      data = err.data.data;
+      err.message = err.data.message;
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
