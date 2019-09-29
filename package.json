@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^16.1.4",
-    "@random-guys/bucket": "^0.1.0",
+    "@random-guys/bucket": "^0.4.0",
     "@random-guys/express-bunyan": "^0.2.0",
     "@random-guys/express-jsend": "^0.1.0",
     "@types/hapi__joi": "^15.0.4",
