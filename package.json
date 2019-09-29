@@ -32,9 +32,11 @@
     "typescript": "^3.5.2"
   },
   "dependencies": {
+    "@hapi/joi": "^16.1.4",
     "@random-guys/bucket": "^0.1.0",
     "@random-guys/express-bunyan": "^0.2.0",
     "@random-guys/express-jsend": "^0.1.0",
+    "@types/hapi__joi": "^15.0.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "http-status-codes": "^1.3.2",
