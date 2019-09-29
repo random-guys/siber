@@ -1,10 +1,14 @@
 import { logRequests } from '@random-guys/express-bunyan';
 import { refreshJSend } from '@random-guys/express-jsend';
 import Logger from 'bunyan';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import express, { Application } from 'express';
 import responseTime from 'response-time';
-import { SiberConfig } from './contracts';
+
+export interface SiberConfig {
+  cors: boolean | CorsOptions;
+  tracking: boolean;
+}
 
 export function build(app: Application, logger: Logger, conf: SiberConfig) {
   // default middleware
