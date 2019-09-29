@@ -1,19 +1,21 @@
-import { DuplicateModelError, ModelNotFoundError } from "@random-guys/bucket";
-import { logError, logResponse } from "@random-guys/express-bunyan";
-import "@random-guys/express-jsend"; // jSend type def
-import Logger from "bunyan";
-import { Request, Response } from "express";
-import HttpStatus from "http-status-codes";
-import { injectable, unmanaged } from "inversify";
-import pick from "lodash/pick";
-import { PaginationOptions } from "./contracts";
-import { ConstraintDataError } from "./errors";
-
+import {
+  DuplicateModelError,
+  ModelNotFoundError,
+  Query
+} from '@random-guys/bucket';
+import { logError, logResponse } from '@random-guys/express-bunyan';
+import '@random-guys/express-jsend'; // jSend type def
+import Logger from 'bunyan';
+import { Request, Response } from 'express';
+import HttpStatus from 'http-status-codes';
+import { injectable, unmanaged } from 'inversify';
+import pick from 'lodash/pick';
+import { ConstraintDataError } from './errors';
+import { IrisAPIError } from '@random-guys/iris';
 
 @injectable()
 export class Controller<T> {
-
-  constructor(@unmanaged() private logger: Logger) { }
+  constructor(@unmanaged() private logger: Logger) {}
 
   /**
    * Determines the HTTP status code of an error
@@ -25,11 +27,12 @@ export class Controller<T> {
       return err.code;
     if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
     if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
+    if (err instanceof IrisAPIError) return err.data.code;
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
   /**
-   * Safely run the handler converting any error to a JSEND error and 
+   * Safely run the handler converting any error to a JSEND error and
    * any ensuring a Controller response T is returned.
    * @param req request object from express
    * @param res response object from express
@@ -70,7 +73,12 @@ export class Controller<T> {
     if (res.headersSent) return this.logger.error(err);
 
     if (err instanceof ConstraintDataError) {
-      data = err.data
+      data = err.data;
+    }
+
+    if (err instanceof IrisAPIError) {
+      data = err.data.data;
+      err.message = err.data.message;
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
@@ -85,3 +93,8 @@ export class Controller<T> {
     return pick(query, ['page', 'per_page', 'projections', 'sort']);
   }
 }
+
+export type PaginationOptions = Pick<
+  Query,
+  Exclude<keyof Query, 'conditions' | 'archived'>
+>;

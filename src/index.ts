@@ -1,6 +1,5 @@
-export * from "./lib/compose";
-export * from "./lib/controller";
-export * from "./lib/errors";
-export * from "./lib/middleware";
-export * from "./lib/contracts";
-
+export * from './compose';
+export * from './controller';
+export * from './errors';
+export * from './middleware';
+export * from './validate';
