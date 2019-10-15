@@ -10,7 +10,7 @@ import HttpStatus from 'http-status-codes';
 import { injectable, unmanaged } from 'inversify';
 import pick from 'lodash/pick';
 import { ConstraintDataError } from './errors';
-import { IrisAPIError } from '@random-guys/iris';
+import { IrisAPIError, IrisError, IrisServerError } from '@random-guys/iris';
 
 @injectable()
 export class Controller<T> {
@@ -27,6 +27,11 @@ export class Controller<T> {
     if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
     if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
     if (err instanceof IrisAPIError) return err.data.code;
+    if (err instanceof IrisError)
+      return /timeout/.test(err.message)
+        ? HttpStatus.GATEWAY_TIMEOUT
+        : HttpStatus.BAD_GATEWAY;
+
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
@@ -78,6 +83,10 @@ export class Controller<T> {
     if (err instanceof IrisAPIError) {
       data = err.data.data;
       err.message = err.data.message;
+    }
+
+    if (err instanceof IrisServerError) {
+      err.message = 'We are having internal issues. Please bear with us';
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
