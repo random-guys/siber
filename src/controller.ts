@@ -3,7 +3,6 @@ import {
   ModelNotFoundError,
   Query
 } from '@random-guys/bucket';
-import { logError, logResponse } from '@random-guys/express-bunyan';
 import '@random-guys/express-jsend'; // jSend type def
 import Logger from 'bunyan';
 import { Request, Response } from 'express';
@@ -58,7 +57,7 @@ export class Controller<T> {
    */
   handleSuccess(req: Request, res: Response, data: T) {
     res.jSend.success(data);
-    logResponse(this.logger, req, res);
+    this.logger.info({ req, res });
   }
 
   /**
@@ -82,7 +81,7 @@ export class Controller<T> {
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
-    logError(this.logger, err, req, res);
+    this.logger.error({ err, res, req });
   }
 
   /**

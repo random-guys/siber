@@ -327,15 +327,6 @@
     npm-cli-login "^0.1.1"
     uuid "^3.3.2"
 
-"@random-guys/express-bunyan@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@random-guys/express-bunyan/-/express-bunyan-0.2.0.tgz#d5dd263f267b23cf1bdb7aacebeabc495acd9327"
-  integrity sha512-dcXT6Aj7stn2Y9Do2e1YTRy9N+3dYR8Nc2Q996sg0YkEmsNW/9tjTEdHLl4qhLA4CTPpf5NPzxPhbZKLARBbOQ==
-  dependencies:
-    "@types/uuid" "^3.4.4"
-    bunyan "^1.8.12"
-    express "^4.17.1"
-
 "@random-guys/express-jsend@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@random-guys/express-jsend/-/express-jsend-0.1.0.tgz#7510953dd31d555baf2aecdaa28d5c2bf4638bfa"
