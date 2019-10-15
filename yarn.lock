@@ -327,14 +327,6 @@
     npm-cli-login "^0.1.1"
     uuid "^3.3.2"
 
-"@random-guys/express-jsend@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@random-guys/express-jsend/-/express-jsend-0.1.0.tgz#7510953dd31d555baf2aecdaa28d5c2bf4638bfa"
-  integrity sha512-oTMG5rct2e8uUkzRps0NTJHOmBYO+0+xklajHB0uRKJmdoqBOzzQ+4LHSHxnfo19VlLj+HcdNu4+PsG8dLfWmw==
-  dependencies:
-    express "^4.17.1"
-    http-status-codes "^1.3.2"
-
 "@random-guys/iris@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@random-guys/iris/-/iris-1.1.0.tgz#760631fe4cb3790344750828f1424516214467dd"

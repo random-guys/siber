@@ -1,9 +1,9 @@
-import { refreshJSend } from '@random-guys/express-jsend';
 import Logger from 'bunyan';
 import cors, { CorsOptions } from 'cors';
 import express, { Application } from 'express';
 import responseTime from 'response-time';
 import { requestTracker } from './logging';
+import { refreshJSend } from './jsend';
 
 export interface SiberConfig {
   cors: boolean | CorsOptions;

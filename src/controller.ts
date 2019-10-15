@@ -22,10 +22,13 @@ export class Controller<T> {
    */
   getHTTPErrorCode(err: any) {
     // check if error code exists and is a valid HTTP code.
-    if (err.code && (err.code as number).toString().length === 3)
-      return err.code;
+    if (err.code >= 100 && err.code < 600) return err.code;
+
+    // integration with bucket
     if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
     if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
+
+    // integration with iris
     if (err instanceof IrisAPIError) return err.data.code;
     if (err instanceof IrisError)
       return /timeout/.test(err.message)
@@ -46,11 +49,7 @@ export class Controller<T> {
     try {
       this.handleSuccess(req, res, await handler());
     } catch (err) {
-      if (err instanceof ConstraintDataError) {
-        this.handleError(req, res, err, err.data);
-      } else {
-        this.handleError(req, res, err);
-      }
+      this.handleError(req, res, err);
     }
   }
 
