@@ -10,7 +10,7 @@ import HttpStatus from 'http-status-codes';
 import { injectable, unmanaged } from 'inversify';
 import pick from 'lodash/pick';
 import { ConstraintDataError } from './errors';
-import { IrisAPIError, IrisError, IrisServerError } from '@random-guys/iris';
+import { IrisAPIError, IrisServerError } from '@random-guys/iris';
 
 @injectable()
 export class Controller<T> {
@@ -30,7 +30,7 @@ export class Controller<T> {
 
     // integration with iris
     if (err instanceof IrisAPIError) return err.data.code;
-    if (err instanceof IrisError)
+    if (err instanceof IrisServerError)
       return /timeout/.test(err.message)
         ? HttpStatus.GATEWAY_TIMEOUT
         : HttpStatus.BAD_GATEWAY;
