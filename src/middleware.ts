@@ -1,9 +1,9 @@
-import { logRequests } from '@random-guys/express-bunyan';
-import { refreshJSend } from '@random-guys/express-jsend';
 import Logger from 'bunyan';
 import cors, { CorsOptions } from 'cors';
 import express, { Application } from 'express';
 import responseTime from 'response-time';
+import { requestTracker } from './logging';
+import { refreshJSend } from './jsend';
 
 export interface SiberConfig {
   cors: boolean | CorsOptions;
@@ -31,7 +31,7 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
 
   // logging and metrics
   if (conf.tracking) {
-    app.use(logRequests(logger));
+    app.use(requestTracker(logger));
     app.use(responseTime());
   }
 }

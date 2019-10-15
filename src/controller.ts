@@ -3,7 +3,6 @@ import {
   ModelNotFoundError,
   Query
 } from '@random-guys/bucket';
-import { logError, logResponse } from '@random-guys/express-bunyan';
 import '@random-guys/express-jsend'; // jSend type def
 import Logger from 'bunyan';
 import { Request, Response } from 'express';
@@ -11,7 +10,7 @@ import HttpStatus from 'http-status-codes';
 import { injectable, unmanaged } from 'inversify';
 import pick from 'lodash/pick';
 import { ConstraintDataError } from './errors';
-import { IrisAPIError } from '@random-guys/iris';
+import { IrisAPIError, IrisServerError } from '@random-guys/iris';
 
 @injectable()
 export class Controller<T> {
@@ -23,11 +22,19 @@ export class Controller<T> {
    */
   getHTTPErrorCode(err: any) {
     // check if error code exists and is a valid HTTP code.
-    if (err.code && (err.code as number).toString().length === 3)
-      return err.code;
+    if (err.code >= 100 && err.code < 600) return err.code;
+
+    // integration with bucket
     if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
     if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
+
+    // integration with iris
     if (err instanceof IrisAPIError) return err.data.code;
+    if (err instanceof IrisServerError)
+      return /timeout/.test(err.message)
+        ? HttpStatus.GATEWAY_TIMEOUT
+        : HttpStatus.BAD_GATEWAY;
+
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
@@ -42,11 +49,7 @@ export class Controller<T> {
     try {
       this.handleSuccess(req, res, await handler());
     } catch (err) {
-      if (err instanceof ConstraintDataError) {
-        this.handleError(req, res, err, err.data);
-      } else {
-        this.handleError(req, res, err);
-      }
+      this.handleError(req, res, err);
     }
   }
 
@@ -58,7 +61,7 @@ export class Controller<T> {
    */
   handleSuccess(req: Request, res: Response, data: T) {
     res.jSend.success(data);
-    logResponse(this.logger, req, res);
+    this.logger.info({ req, res });
   }
 
   /**
@@ -81,8 +84,12 @@ export class Controller<T> {
       err.message = err.data.message;
     }
 
+    if (err instanceof IrisServerError) {
+      err.message = 'We are having internal issues. Please bear with us';
+    }
+
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
-    logError(this.logger, err, req, res);
+    this.logger.error({ err, res, req });
   }
 
   /**
