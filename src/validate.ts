@@ -1,5 +1,4 @@
 import joi, { SchemaLike, ValidationError } from '@hapi/joi';
-import '@random-guys/express-jsend';
 import { NextFunction, Request, Response } from 'express';
 import HttpStatus from 'http-status-codes';
 
