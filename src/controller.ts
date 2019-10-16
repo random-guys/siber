@@ -3,7 +3,6 @@ import {
   ModelNotFoundError,
   Query
 } from '@random-guys/bucket';
-import '@random-guys/express-jsend'; // jSend type def
 import Logger from 'bunyan';
 import { Request, Response } from 'express';
 import HttpStatus from 'http-status-codes';
