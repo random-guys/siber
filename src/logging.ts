@@ -77,9 +77,13 @@ export const errSerializer = (err: any) => {
  */
 export function requestTracker(log: Logger) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    // create a request ID for tracking
-    req.id = uuid();
-    req.headers['x-request-id'] = req.id;
+    // create a request ID for tracking if non exists
+    if (!req.headers['x-request-id']) {
+      req.headers['x-request-id'] = uuid();
+    }
+
+    // @ts-ignore because TS can be smarted...maybe
+    req.id = req.headers['x-request-id'];
 
     // log requests
     log.info({ req });
