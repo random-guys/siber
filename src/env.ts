@@ -1,15 +1,30 @@
-import joi from '@hapi/joi';
+import joi, { SchemaLike } from '@hapi/joi';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
+import { parseError } from './validate';
 
 dotenv.config();
 
 export function autoloadEnv<T extends SiberConfig>(schema: SchemaLike): T {
-  // we don't use the return value because env might not contain all vars
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
   });
+
+  return validateConfig(processedEnv, schema);
+}
+
+export function validateConfig<T>(data: any, schema: SchemaLike): T {
+  const { error, value } = joi.validate(data, schema, {
+    abortEarly: false,
+    stripUnknown: true
+  });
+
+  if (error) {
+    throw new Error(`Unable to validate configuration: ${parseError(error)}`);
+  }
+
+  return value;
 }
 
 export const basicSiberConfig = {
@@ -24,3 +39,10 @@ export const basicSiberConfig = {
     .required()
     .min(32)
 };
+
+export interface SiberConfig {
+  api_version: string;
+  app_env: string;
+  port: number;
+  service_secret: string;
+}
