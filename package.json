@@ -1,6 +1,6 @@
 {
   "name": "@random-guys/siber",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "Wrapper around axios for interservice communication",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@random-guys/bucket": "^0.5.1",
+    "@random-guys/bucket": "^0.7.0",
     "@random-guys/iris": "^1.1.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
