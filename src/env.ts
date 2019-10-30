@@ -48,6 +48,7 @@ const basicSiberConfig = {
     .valid('dev', 'production', 'staging')
     .default('dev'),
   port: joi.number().required(),
+  service_name: joi.string().required(),
   service_secret: joi
     .string()
     .required()
@@ -110,6 +111,10 @@ export interface AppConfig {
    * 32 char string to be used for sessions and seals
    */
   service_secret: string;
+  /**
+   * Name of the service. This will appear in the logs
+   */
+  service_name: string;
 }
 
 export interface RedisConfig {
