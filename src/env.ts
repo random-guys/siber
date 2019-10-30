@@ -43,6 +43,7 @@ function validateConfig<T extends AppConfig>(data: any, schema: SchemaMap): T {
  */
 const basicSiberConfig = {
   api_version: joi.string().default('/api/v1'),
+  auth_scheme: joi.string().required(),
   node_env: joi
     .string()
     .valid('dev', 'production', 'staging')
@@ -103,6 +104,10 @@ export interface AppConfig {
    * Eqivalent to `NODE_ENV`
    */
   app_env: string;
+  /**
+   * Scheme for intersevice communication
+   */
+  auth_scheme: string;
   /**
    * What port number to serve the app
    */
