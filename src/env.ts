@@ -1,4 +1,4 @@
-import joi, { SchemaLike } from '@hapi/joi';
+import joi, { SchemaMap } from '@hapi/joi';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
@@ -9,7 +9,7 @@ import { parseError } from './validate';
  * keys.
  * @param schema schema to use for validation
  */
-export function autoloadEnv<T extends SiberConfig>(schema: SchemaLike): T {
+export function autoloadEnv<T extends SiberConfig>(schema: SchemaMap): T {
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
@@ -27,7 +27,7 @@ export function autoloadEnv<T extends SiberConfig>(schema: SchemaLike): T {
  */
 function validateConfig<T extends SiberConfig>(
   data: any,
-  schema: SchemaLike
+  schema: SchemaMap
 ): T {
   const { error, value } = joi.validate(data, schema, {
     abortEarly: false,
@@ -68,6 +68,9 @@ export function optionalForDev() {
   });
 }
 
+/**
+ * Schema for validating mongo configuration
+ */
 export const mongoConfig = {
   mongodb_url: joi.string().required(),
   mongodb_username: optionalForDev(),
