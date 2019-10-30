@@ -88,6 +88,14 @@ export const mongoConfig = {
   mongodb_password: optionalForDev()
 };
 
+/**
+ * Schema for validating redis configuration
+ */
+export const redisConfig = {
+  redis_url: joi.string().required(),
+  redis_password: optionalForDev()
+};
+
 export interface SiberConfig {
   /**
    * Help API clients choose
@@ -105,4 +113,15 @@ export interface SiberConfig {
    * 32 char string to be used for sessions and seals
    */
   service_secret: string;
+}
+
+export interface RedisConfig {
+  /**
+   * URL for redis
+   */
+  redis_url: string;
+  /**
+   * Password for authenticating with redis. Mostly on production/staging
+   */
+  redis_password: string;
 }
