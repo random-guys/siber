@@ -1,5 +1,4 @@
 import joi, { SchemaLike } from '@hapi/joi';
-import { MongoConfig } from '@random-guys/bucket';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
@@ -75,7 +74,7 @@ export const mongoConfig = {
   mongodb_password: optionalForDev()
 };
 
-export interface SiberConfig extends MongoConfig {
+export interface SiberConfig {
   /**
    * Help API clients choose
    */
