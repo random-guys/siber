@@ -14,7 +14,10 @@ export function autoloadEnv<T extends SiberConfig>(schema: SchemaLike): T {
   return validateConfig(processedEnv, schema);
 }
 
-export function validateConfig<T>(data: any, schema: SchemaLike): T {
+function validateConfig<T extends SiberConfig>(
+  data: any,
+  schema: SchemaLike
+): T {
   const { error, value } = joi.validate(data, schema, {
     abortEarly: false,
     stripUnknown: true
@@ -25,4 +28,24 @@ export function validateConfig<T>(data: any, schema: SchemaLike): T {
   }
 
   return value;
+}
+
+export const basicSiberConfig = {
+  api_version: joi.string().default('/api/v1'),
+  app_env: joi
+    .string()
+    .valid('dev', 'production', 'staging')
+    .default('dev'),
+  port: joi.number().required(),
+  service_secret: joi
+    .string()
+    .required()
+    .min(32)
+};
+
+export interface SiberConfig {
+  api_version: string;
+  app_env: string;
+  port: number;
+  service_secret: string;
 }
