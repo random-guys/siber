@@ -5,7 +5,7 @@ import { parseError } from './validate';
 
 dotenv.config();
 
-export function autoloadEnv<T extends SiberConfig>(schema: SchemaLike): T {
+export function autoloadEnv<T>(schema: SchemaLike): T {
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
