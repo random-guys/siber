@@ -78,7 +78,7 @@ export function siberConfig(schema: SchemaMap) {
  */
 export function optionalForDev() {
   return joi.when('node_env', {
-    is: joi.valid('dev'),
+    is: joi.invalid('dev'),
     then: joi.string().required(),
     otherwise: joi.string()
   });
