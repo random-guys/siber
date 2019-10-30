@@ -19,7 +19,7 @@ export function autoloadEnv<T extends AppConfig>(schema: ObjectSchema): T {
 }
 
 /**
- * Validate an env object using the schema. It'll throw an error if such
+ * Validate an env object using the schema. It'll exit the program if such
  * validation fails, but return the parsed value otherwise. Note that it
  * removes unspecified keys
  * @param data env object
@@ -35,7 +35,10 @@ function validateConfig<T extends AppConfig>(
   });
 
   if (error) {
-    throw new Error(`Unable to validate configuration: ${parseError(error)}`);
+    // TODO: what is this?? find a solution
+    console.error('Unable to validate configuration');
+    console.error(parseError(error));
+    process.exit(1);
   }
 
   return value;
