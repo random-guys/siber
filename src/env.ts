@@ -58,6 +58,15 @@ const basicSiberConfig = {
 };
 
 /**
+ * Creates an actual object schema and ensures `node_env`
+ * becomes `app_env`
+ * @param schema map of keys to schemas
+ */
+export function siberConfig(schema: SchemaMap) {
+  return joi.object(schema).rename('node_env', 'app_env');
+}
+
+/**
  * Creates a field that becomes required when `NODE_ENV != dev`.
  */
 export function optionalForDev() {
