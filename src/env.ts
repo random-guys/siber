@@ -9,7 +9,7 @@ import { parseError } from './validate';
  * keys.
  * @param schema schema to use for validation
  */
-export function autoloadEnv<T extends SiberConfig>(schema: SchemaMap): T {
+export function autoloadEnv<T extends AppConfig>(schema: SchemaMap): T {
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
@@ -25,10 +25,7 @@ export function autoloadEnv<T extends SiberConfig>(schema: SchemaMap): T {
  * @param data env object
  * @param schema schema to use for validation
  */
-function validateConfig<T extends SiberConfig>(
-  data: any,
-  schema: SchemaMap
-): T {
+function validateConfig<T extends AppConfig>(data: any, schema: SchemaMap): T {
   const { error, value } = joi.validate(data, schema, {
     abortEarly: false,
     stripUnknown: true
@@ -96,7 +93,7 @@ export const redisConfig = {
   redis_password: optionalForDev()
 };
 
-export interface SiberConfig {
+export interface AppConfig {
   /**
    * Help API clients choose
    */
