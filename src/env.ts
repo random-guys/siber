@@ -70,7 +70,7 @@ const basicSiberConfig = {
 export function siberConfig(schema: SchemaMap) {
   return joi
     .object({ ...basicSiberConfig, ...schema })
-    .rename('node_env', 'app_env');
+    .rename('node_env', 'app_env', { alias: true });
 }
 
 /**
@@ -108,6 +108,10 @@ export interface AppConfig {
   api_version: string;
   /**
    * Eqivalent to `NODE_ENV`
+   */
+  node_env: string;
+  /**
+   * Alias to `node_env`
    */
   app_env: string;
   /**
