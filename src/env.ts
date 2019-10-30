@@ -1,4 +1,4 @@
-import joi, { SchemaMap } from '@hapi/joi';
+import joi, { ObjectSchema, SchemaMap } from '@hapi/joi';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
@@ -9,7 +9,7 @@ import { parseError } from './validate';
  * keys.
  * @param schema schema to use for validation
  */
-export function autoloadEnv<T extends AppConfig>(schema: SchemaMap): T {
+export function autoloadEnv<T extends AppConfig>(schema: ObjectSchema): T {
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
@@ -25,7 +25,10 @@ export function autoloadEnv<T extends AppConfig>(schema: SchemaMap): T {
  * @param data env object
  * @param schema schema to use for validation
  */
-function validateConfig<T extends AppConfig>(data: any, schema: SchemaMap): T {
+function validateConfig<T extends AppConfig>(
+  data: any,
+  schema: ObjectSchema
+): T {
   const { error, value } = joi.validate(data, schema, {
     abortEarly: false,
     stripUnknown: true
