@@ -30,9 +30,9 @@ function validateConfig<T extends SiberConfig>(
   return value;
 }
 
-export const basicSiberConfig = {
+const basicSiberConfig = {
   api_version: joi.string().default('/api/v1'),
-  app_env: joi
+  node_env: joi
     .string()
     .valid('dev', 'production', 'staging')
     .default('dev'),
