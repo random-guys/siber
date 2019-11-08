@@ -1,7 +1,17 @@
-import joi, { ObjectSchema, SchemaMap } from '@hapi/joi';
+import joi, { ObjectSchema, SchemaMap, ValidationError } from '@hapi/joi';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
+
+export class IncompleteEnvError extends Error {
+  constructor(error: ValidationError) {
+    const parsedError = parseError(error);
+
+    super(
+      `Unable to load environment:\n${JSON.stringify(parsedError, null, 2)}`
+    );
+  }
+}
 
 /**
  * Load process environment and validate the keys needed. Do make sure you
@@ -36,9 +46,7 @@ function validateConfig<T extends AppConfig>(
 
   if (error) {
     // TODO: what is this?? find a solution
-    console.error('Unable to validate configuration');
-    console.error(parseError(error));
-    process.exit(1);
+    throw new IncompleteEnvError(error);
   }
 
   return value;
