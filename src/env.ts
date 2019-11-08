@@ -49,6 +49,11 @@ function validateConfig<T extends AppConfig>(
     throw new IncompleteEnvError(error);
   }
 
+  // node_env hack
+  if (value.node_env) {
+    value.app_env = value.node_env;
+  }
+
   return value;
 }
 
@@ -60,7 +65,7 @@ const basicSiberConfig = {
   auth_scheme: joi.string().required(),
   node_env: joi
     .string()
-    .valid('dev', 'production', 'staging')
+    .valid('dev', 'test', 'production', 'staging')
     .default('dev'),
   port: joi.number().required(),
   service_name: joi.string().required(),
@@ -76,9 +81,7 @@ const basicSiberConfig = {
  * @param schema map of keys to schemas
  */
 export function siberConfig(schema: SchemaMap) {
-  return joi
-    .object({ ...basicSiberConfig, ...schema })
-    .rename('node_env', 'app_env', { alias: true });
+  return joi.object({ ...basicSiberConfig, ...schema });
 }
 
 /**
@@ -86,7 +89,7 @@ export function siberConfig(schema: SchemaMap) {
  */
 export function optionalForDev() {
   return joi.when('node_env', {
-    is: joi.invalid('dev'),
+    is: joi.valid('production', 'staging'),
     then: joi.string().required(),
     otherwise: joi.string()
   });
