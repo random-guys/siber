@@ -1,4 +1,5 @@
 import joi, { ObjectSchema, SchemaMap, ValidationError } from '@hapi/joi';
+import { MongoConfig } from '@random-guys/bucket';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
@@ -49,11 +50,6 @@ function validateConfig<T extends AppConfig>(
     throw new IncompleteEnvError(error);
   }
 
-  // node_env hack
-  if (value.node_env) {
-    value.app_env = value.node_env;
-  }
-
   return value;
 }
 
@@ -67,6 +63,11 @@ const basicSiberConfig = {
     .string()
     .valid('dev', 'test', 'production', 'staging')
     .default('dev'),
+  is_production: joi.when('node_env', {
+    is: joi.valid('dev', 'test'),
+    then: joi.boolean().default(false),
+    otherwise: joi.boolean().default(true)
+  }),
   port: joi.number().required(),
   service_name: joi.string().required(),
   service_secret: joi
@@ -122,9 +123,9 @@ export interface AppConfig {
    */
   node_env: string;
   /**
-   * Alias to `node_env`
+   * True if `node_env` is `production` or `staging`
    */
-  app_env: string;
+  is_production: boolean;
   /**
    * Scheme for intersevice communication
    */
@@ -151,5 +152,15 @@ export interface RedisConfig {
   /**
    * Password for authenticating with redis. Mostly on production/staging
    */
-  redis_password: string;
+  redis_password?: string;
 }
+
+/**
+ * This is for apps that only need sessions
+ */
+export interface SessionedApp extends AppConfig, RedisConfig {}
+
+/**
+ * This is for apps that want the full package
+ */
+export interface DBApp extends SessionedApp, MongoConfig {}
