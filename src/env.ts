@@ -1,4 +1,5 @@
 import joi, { ObjectSchema, SchemaMap, ValidationError } from '@hapi/joi';
+import { MongoConfig } from '@random-guys/bucket';
 import dotenv from 'dotenv';
 import mapKeys from 'lodash/mapKeys';
 import { parseError } from './validate';
@@ -151,5 +152,15 @@ export interface RedisConfig {
   /**
    * Password for authenticating with redis. Mostly on production/staging
    */
-  redis_password: string;
+  redis_password?: string;
 }
+
+/**
+ * This is for apps that only need sessions
+ */
+export interface SessionedApp extends AppConfig, RedisConfig {}
+
+/**
+ * This is for apps that want the full package
+ */
+export interface DBApp extends SessionedApp, MongoConfig {}
