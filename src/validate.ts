@@ -38,7 +38,7 @@ export function validate(
     }
 
     //log error
-    const error = 'One or more validation errors occured';
-    throw new ConstraintDataError(error, err);
+    const message = 'One or more validation errors occured';
+    throw new ConstraintDataError(message, err);
   };
 }
