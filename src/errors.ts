@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import HttpStatus from 'http-status-codes';
+import { IrisAPIError, IrisServerError } from '@random-guys/iris';
+import Logger from 'bunyan';
 
 export interface HttpError {
   readonly code: number;
@@ -69,10 +71,24 @@ export class ConstraintDataError extends ControllerError
   }
 }
 
-export function defaultErrorHandler(req: Request, res: Response, next: NextFunction, err: Error, data?: any) {
+export function defaultErrorHandler(req: Request, res: Response, err: Error, logger: Logger, data?: any) {
   // useful when we have call an asynchrous function that might throw
   // after we've sent a response to client
-  if (res.headersSent) {
-    next(err);
+  if (res.headersSent) return logger.error(err);
+
+  if (err instanceof ConstraintDataError) {
+    data = err.data;
   }
+
+  if (err instanceof IrisAPIError) {
+    data = err.data.data;
+    err.message = err.data.message;
+  }
+
+  if (err instanceof IrisServerError) {
+    err.message = 'We are having internal issues. Please bear with us';
+  }
+
+  res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
+  logger.error({ err, res, req });
 }
