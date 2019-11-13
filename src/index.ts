@@ -8,7 +8,6 @@ export * from './jsend';
 export * from './logging';
 export * from './middleware';
 export * from './validate';
-export * from './defaultErrorHandler';
 
 declare global {
   namespace Express {

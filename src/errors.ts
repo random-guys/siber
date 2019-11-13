@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import HttpStatus from 'http-status-codes';
 
 export interface HttpError {
@@ -65,5 +66,13 @@ export class ConstraintDataError extends ControllerError
   constructor(message: string, data: any) {
     super(message);
     this.data = data;
+  }
+}
+
+export function defaultErrorHandler(req: Request, res: Response, next: NextFunction, err: Error, data?: any) {
+  // useful when we have call an asynchrous function that might throw
+  // after we've sent a response to client
+  if (res.headersSent) {
+    next(err);
   }
 }
