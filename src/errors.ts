@@ -34,6 +34,13 @@ export class ActionNotAllowedError extends ControllerError {
   }
 }
 
+export class BadRequestError extends ControllerError {
+  constructor(message: string) {
+    super(message);
+    this.code = HttpStatus.BAD_REQUEST;
+  }
+}
+
 export class BadGatewayError extends ControllerError {
   constructor(message: string) {
     super(message);
