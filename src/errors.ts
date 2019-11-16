@@ -1,7 +1,7 @@
 import { DuplicateModelError, ModelNotFoundError } from "@random-guys/bucket";
 import { IrisAPIError, IrisServerError } from "@random-guys/iris";
 import Logger from "bunyan";
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
 
 export class ControllerError extends Error {
@@ -87,13 +87,17 @@ export function getHTTPErrorCode(err: any) {
   return HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
-export const universalErrorHandler = (
-  err: any,
-  logger: Logger
-): RequestHandler => {
+/**
+ * A error general handler that handles:
+ * - any `ControllerError`
+ * - `bucket` errors
+ * - `iris` errors
+ * @param logger Logger to log errors and their corresponding request/response pair
+ */
+export const universalErrorHandler = (logger: Logger): ErrorRequestHandler => {
   // useful when we have call an asynchrous function that might throw
   // after we've sent a response to client
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
 
     const code = getHTTPErrorCode(err);
