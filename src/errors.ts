@@ -109,6 +109,7 @@ export const universalErrorHandler = (
     }
 
     if (err instanceof IrisServerError || code === 500) {
+      err.original_message = err.message;
       err.message = "We are having internal issues. Please bear with us";
     }
 
