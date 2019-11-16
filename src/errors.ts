@@ -18,7 +18,7 @@ export class ServerError extends ControllerError {
   }
 }
 
-export class ActionNotAllowedError extends ControllerError {
+export class ForbiddenError extends ControllerError {
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.FORBIDDEN;
@@ -39,7 +39,7 @@ export class BadGatewayError extends ControllerError {
   }
 }
 
-export class UnavailableGatewayError extends ControllerError {
+export class GatewayTImeoutError extends ControllerError {
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.GATEWAY_TIMEOUT;
