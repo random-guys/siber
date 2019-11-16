@@ -96,15 +96,10 @@ export const universalErrorHandler = (
   return async (req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
 
-    let data: any;
     const code = getHTTPErrorCode(err);
 
-    if (err instanceof ConstraintDataError) {
-      data = err.data;
-    }
-
     if (err instanceof IrisAPIError) {
-      data = err.data.data;
+      err.data = err.data.data;
       err.message = err.data.message;
     }
 
@@ -113,7 +108,7 @@ export const universalErrorHandler = (
       err.message = "We are having internal issues. Please bear with us";
     }
 
-    res.jSend.error(data, err.message, code);
+    res.jSend.error(err.data, err.message, code);
     logger.error({ err, res, req });
   };
 };
