@@ -2,14 +2,14 @@ import {
   DuplicateModelError,
   ModelNotFoundError,
   Query
-} from '@random-guys/bucket';
-import Logger from 'bunyan';
-import { Request, Response } from 'express';
-import HttpStatus from 'http-status-codes';
-import { injectable, unmanaged } from 'inversify';
-import pick from 'lodash/pick';
-import { ConstraintDataError } from './errors';
-import { IrisAPIError, IrisServerError } from '@random-guys/iris';
+} from "@random-guys/bucket";
+import Logger from "bunyan";
+import { Request, Response } from "express";
+import HttpStatus from "http-status-codes";
+import { injectable, unmanaged } from "inversify";
+import pick from "lodash/pick";
+import { ConstraintDataError } from "./errors";
+import { IrisAPIError, IrisServerError } from "@random-guys/iris";
 
 @injectable()
 export class Controller<T> {
@@ -84,7 +84,7 @@ export class Controller<T> {
     }
 
     if (err instanceof IrisServerError) {
-      err.message = 'We are having internal issues. Please bear with us';
+      err.message = "We are having internal issues. Please bear with us";
     }
 
     res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
@@ -96,11 +96,11 @@ export class Controller<T> {
    * @param query Express Query object
    */
   getPaginationOptions(query: any): PaginationOptions {
-    return pick(query, ['page', 'per_page', 'projections', 'sort']);
+    return pick(query, ["page", "per_page", "projections", "sort"]);
   }
 }
 
 export type PaginationOptions = Pick<
   Query,
-  Exclude<keyof Query, 'conditions' | 'archived'>
+  Exclude<keyof Query, "conditions" | "archived">
 >;

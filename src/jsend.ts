@@ -1,5 +1,5 @@
-import { RequestHandler, Response } from 'express';
-import HttpStatus from 'http-status-codes';
+import { RequestHandler, Response } from "express";
+import HttpStatus from "http-status-codes";
 
 export const refreshJSend: RequestHandler = (_req, res, next) => {
   res.jSend = new JSend(res);
@@ -16,19 +16,19 @@ export class JSend implements JSendContract {
   constructor(private readonly res: Response) {}
 
   success(data: any) {
-    this.res.json({ status: 'success', data });
+    this.res.json({ status: "success", data });
   }
 
   fail(data: any) {
     this.res
       .status(HttpStatus.EXPECTATION_FAILED)
-      .json({ status: 'fail', data });
+      .json({ status: "fail", data });
   }
 
   error(data: any, message: string, code?: number) {
     const httpCode = code || HttpStatus.INTERNAL_SERVER_ERROR;
     this.res.status(httpCode).json({
-      status: 'error',
+      status: "error",
       data,
       message,
       code: httpCode

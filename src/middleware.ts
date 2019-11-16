@@ -1,9 +1,9 @@
-import Logger from 'bunyan';
-import cors, { CorsOptions } from 'cors';
-import express, { Application } from 'express';
-import responseTime from 'response-time';
-import { requestTracker } from './logging';
-import { refreshJSend } from './jsend';
+import Logger from "bunyan";
+import cors, { CorsOptions } from "cors";
+import express, { Application } from "express";
+import responseTime from "response-time";
+import { requestTracker } from "./logging";
+import { refreshJSend } from "./jsend";
 
 export interface SiberConfig {
   cors: boolean | CorsOptions;
@@ -18,7 +18,7 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
 
   // CORS
   if (conf.cors) {
-    if (typeof conf.cors === 'boolean') {
+    if (typeof conf.cors === "boolean") {
       conf.cors = {
         origin: true,
         credentials: true
@@ -26,7 +26,7 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
     }
 
     app.use(cors(conf.cors));
-    app.options('*', cors(conf.cors));
+    app.options("*", cors(conf.cors));
   }
 
   // logging and metrics

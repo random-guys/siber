@@ -1,8 +1,8 @@
-import joi, { ObjectSchema, SchemaMap, ValidationError } from '@hapi/joi';
-import { MongoConfig } from '@random-guys/bucket';
-import dotenv from 'dotenv';
-import mapKeys from 'lodash/mapKeys';
-import { parseError } from './validate';
+import joi, { ObjectSchema, SchemaMap, ValidationError } from "@hapi/joi";
+import { MongoConfig } from "@random-guys/bucket";
+import dotenv from "dotenv";
+import mapKeys from "lodash/mapKeys";
+import { parseError } from "./validate";
 
 export class IncompleteEnvError extends Error {
   constructor(error: ValidationError) {
@@ -57,14 +57,14 @@ function validateConfig<T extends AppConfig>(
  * Basic configuration used by all services
  */
 const basicSiberConfig = {
-  api_version: joi.string().default('/api/v1'),
+  api_version: joi.string().default("/api/v1"),
   auth_scheme: joi.string().required(),
   node_env: joi
     .string()
-    .valid('dev', 'test', 'production', 'staging')
-    .default('dev'),
-  is_production: joi.when('node_env', {
-    is: joi.valid('dev', 'test'),
+    .valid("dev", "test", "production", "staging")
+    .default("dev"),
+  is_production: joi.when("node_env", {
+    is: joi.valid("dev", "test"),
     then: joi.boolean().default(false),
     otherwise: joi.boolean().default(true)
   }),
@@ -89,8 +89,8 @@ export function siberConfig(schema: SchemaMap) {
  * Creates a field that becomes required when `NODE_ENV != dev`.
  */
 export function optionalForDev() {
-  return joi.when('node_env', {
-    is: joi.valid('production', 'staging'),
+  return joi.when("node_env", {
+    is: joi.valid("production", "staging"),
     then: joi.string().required(),
     otherwise: joi.string()
   });
