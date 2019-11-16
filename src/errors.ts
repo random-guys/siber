@@ -69,6 +69,11 @@ export class ConstraintDataError extends ControllerError {
   }
 }
 
+/**
+ * Get the HTTP code for an error that has a prop `code`,or is a `bucket`error, or
+ * a `iris` error. Returns `500` otherwise
+ * @param err error to parse
+ */
 export function getHTTPErrorCode(err: any) {
   // check if error code exists and is a valid HTTP code.
   if (err.code >= 100 && err.code < 600) return err.code;
