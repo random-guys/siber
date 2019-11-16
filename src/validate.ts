@@ -1,6 +1,6 @@
 import joi, { SchemaLike, ValidationError } from "@hapi/joi";
 import { NextFunction, Request, Response } from "express";
-import HttpStatus from "http-status-codes";
+import { ConstraintDataError } from "./errors";
 
 export type ValidationContext = "body" | "query" | "params";
 
@@ -38,7 +38,7 @@ export function validate(
     }
 
     //log error
-    const error = "One or more validation errors occured";
-    return res.jSend.error(err, error, HttpStatus.UNPROCESSABLE_ENTITY);
+    const message = "One or more validation errors occured";
+    throw new ConstraintDataError(message, err);
   };
 }
