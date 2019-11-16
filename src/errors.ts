@@ -87,13 +87,6 @@ export function getHTTPErrorCode(err: any) {
   return HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
-// function customError(err: any) {
-//   if (err instanceof Number) {
-//     return 568
-//   }
-//   return getHTTPErrorCode(err);
-// }
-
 export const universalErrorHandler = (
   err: any,
   logger: Logger
@@ -104,6 +97,8 @@ export const universalErrorHandler = (
     if (res.headersSent) return next(err);
 
     let data: any;
+    const code = getHTTPErrorCode(err);
+
     if (err instanceof ConstraintDataError) {
       data = err.data;
     }
@@ -113,11 +108,11 @@ export const universalErrorHandler = (
       err.message = err.data.message;
     }
 
-    if (err instanceof IrisServerError) {
+    if (err instanceof IrisServerError || code === 500) {
       err.message = "We are having internal issues. Please bear with us";
     }
 
-    res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
+    res.jSend.error(data, err.message, code);
     logger.error({ err, res, req });
   };
 };
