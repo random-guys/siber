@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import HttpStatus from 'http-status-codes';
 import { IrisAPIError, IrisServerError } from '@random-guys/iris';
 import Logger from 'bunyan';
+import { ModelNotFoundError, DuplicateModelError } from '@random-guys/bucket';
 
 export interface HttpError {
   readonly code: number;
@@ -71,24 +72,52 @@ export class ConstraintDataError extends ControllerError
   }
 }
 
-export function defaultErrorHandler(req: Request, res: Response, err: Error, logger: Logger, data?: any) {
+function getHTTPErrorCode(err: any) {
+  // check if error code exists and is a valid HTTP code.
+  if (err.code >= 100 && err.code < 600) return err.code;
+
+  // integration with bucket
+  if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
+  if (err instanceof DuplicateModelError) return HttpStatus.CONFLICT;
+
+  // integration with iris
+  if (err instanceof IrisAPIError) return err.data.code;
+  if (err instanceof IrisServerError)
+    return /timeout/.test(err.message)
+      ? HttpStatus.GATEWAY_TIMEOUT
+      : HttpStatus.BAD_GATEWAY;
+
+  return HttpStatus.INTERNAL_SERVER_ERROR;
+}
+
+// function customError(err: any) {
+//   if (err instanceof Number) {
+//     return 568
+//   }
+//   return getHTTPErrorCode(err);
+// }
+
+export const universalErrorHandler = (err: any, logger: Logger): RequestHandler => {
   // useful when we have call an asynchrous function that might throw
   // after we've sent a response to client
-  if (res.headersSent) return logger.error(err);
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) return next(err);
 
-  if (err instanceof ConstraintDataError) {
-    data = err.data;
+    let data: any;
+    if (err instanceof ConstraintDataError) {
+      data = err.data;
+    }
+
+    if (err instanceof IrisAPIError) {
+      data = err.data.data;
+      err.message = err.data.message;
+    }
+
+    if (err instanceof IrisServerError) {
+      err.message = 'We are having internal issues. Please bear with us';
+    }
+
+    res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
+    logger.error({ err, res, req });
   }
-
-  if (err instanceof IrisAPIError) {
-    data = err.data.data;
-    err.message = err.data.message;
-  }
-
-  if (err instanceof IrisServerError) {
-    err.message = 'We are having internal issues. Please bear with us';
-  }
-
-  res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
-  logger.error({ err, res, req });
 }
