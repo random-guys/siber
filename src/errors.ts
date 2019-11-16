@@ -4,15 +4,7 @@ import Logger from "bunyan";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import HttpStatus from "http-status-codes";
 
-export interface HttpError {
-  readonly code: number;
-}
-
-export interface HttpDataError extends HttpError {
-  readonly data: any;
-}
-
-export class ControllerError extends Error implements HttpError {
+export class ControllerError extends Error {
   code: number;
   constructor(message: string) {
     super(message);
@@ -20,7 +12,6 @@ export class ControllerError extends Error implements HttpError {
 }
 
 export class ServerError extends ControllerError {
-  code: number;
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -69,9 +60,8 @@ export class ConstraintError extends ControllerError {
   }
 }
 
-export class ConstraintDataError extends ControllerError
-  implements HttpDataError {
-  data: any;
+export class ConstraintDataError extends ControllerError {
+  readonly data: any;
   code = HttpStatus.UNPROCESSABLE_ENTITY;
   constructor(message: string, data: any) {
     super(message);
