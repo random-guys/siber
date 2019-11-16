@@ -30,7 +30,7 @@ export class ServerError extends ControllerError {
 export class ActionNotAllowedError extends ControllerError {
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.BAD_REQUEST;
+    this.code = HttpStatus.FORBIDDEN;
   }
 }
 
