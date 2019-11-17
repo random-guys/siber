@@ -1,8 +1,8 @@
-import joi, { SchemaLike, ValidationError } from '@hapi/joi';
-import { NextFunction, Request, Response } from 'express';
-import { ConstraintDataError } from './errors';
+import joi, { SchemaLike, ValidationError } from "@hapi/joi";
+import { NextFunction, Request, Response } from "express";
+import { ConstraintDataError } from "./errors";
 
-export type ValidationContext = 'body' | 'query' | 'params';
+export type ValidationContext = "body" | "query" | "params";
 
 export function parseError(error: ValidationError) {
   return error.details.reduce((acc, curr) => {
@@ -27,7 +27,7 @@ function innerValidate(data: any, schema: SchemaLike) {
 
 export function validate(
   schema: SchemaLike,
-  context: ValidationContext = 'body'
+  context: ValidationContext = "body"
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { err, value } = innerValidate(req[context], schema);
@@ -38,7 +38,7 @@ export function validate(
     }
 
     //log error
-    const message = 'One or more validation errors occured';
+    const message = "One or more validation errors occured";
     throw new ConstraintDataError(message, err);
   };
 }

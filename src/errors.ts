@@ -1,18 +1,10 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
-import HttpStatus from 'http-status-codes';
-import { IrisAPIError, IrisServerError } from '@random-guys/iris';
-import Logger from 'bunyan';
-import { ModelNotFoundError, DuplicateModelError } from '@random-guys/bucket';
+import { DuplicateModelError, ModelNotFoundError } from "@random-guys/bucket";
+import { IrisAPIError, IrisServerError } from "@random-guys/iris";
+import Logger from "bunyan";
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import HttpStatus from "http-status-codes";
 
-export interface HttpError {
-  readonly code: number;
-}
-
-export interface HttpDataError extends HttpError {
-  readonly data: any;
-}
-
-export class ControllerError extends Error implements HttpError {
+export class ControllerError extends Error {
   code: number;
   constructor(message: string) {
     super(message);
@@ -20,14 +12,20 @@ export class ControllerError extends Error implements HttpError {
 }
 
 export class ServerError extends ControllerError {
-  code: number;
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.INTERNAL_SERVER_ERROR;
   }
 }
 
-export class ActionNotAllowedError extends ControllerError {
+export class ForbiddenError extends ControllerError {
+  constructor(message: string) {
+    super(message);
+    this.code = HttpStatus.FORBIDDEN;
+  }
+}
+
+export class BadRequestError extends ControllerError {
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.BAD_REQUEST;
@@ -41,7 +39,7 @@ export class BadGatewayError extends ControllerError {
   }
 }
 
-export class UnavailableGatewayError extends ControllerError {
+export class GatewayTImeoutError extends ControllerError {
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.GATEWAY_TIMEOUT;
@@ -62,9 +60,8 @@ export class ConstraintError extends ControllerError {
   }
 }
 
-export class ConstraintDataError extends ControllerError
-  implements HttpDataError {
-  data: any;
+export class ConstraintDataError extends ControllerError {
+  readonly data: any;
   code = HttpStatus.UNPROCESSABLE_ENTITY;
   constructor(message: string, data: any) {
     super(message);
@@ -72,7 +69,12 @@ export class ConstraintDataError extends ControllerError
   }
 }
 
-function getHTTPErrorCode(err: any) {
+/**
+ * Get the HTTP code for an error that has a prop `code`,or is a `bucket`error, or
+ * a `iris` error. Returns `500` otherwise
+ * @param err error to parse
+ */
+export function getHTTPErrorCode(err: any) {
   // check if error code exists and is a valid HTTP code.
   if (err.code >= 100 && err.code < 600) return err.code;
 
@@ -90,34 +92,32 @@ function getHTTPErrorCode(err: any) {
   return HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
-// function customError(err: any) {
-//   if (err instanceof Number) {
-//     return 568
-//   }
-//   return getHTTPErrorCode(err);
-// }
-
-export const universalErrorHandler = (err: any, logger: Logger): RequestHandler => {
+/**
+ * A error general handler that handles:
+ * - any `ControllerError`
+ * - `bucket` errors
+ * - `iris` errors
+ * @param logger Logger to log errors and their corresponding request/response pair
+ */
+export const universalErrorHandler = (logger: Logger): ErrorRequestHandler => {
   // useful when we have call an asynchrous function that might throw
   // after we've sent a response to client
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
 
-    let data: any;
-    if (err instanceof ConstraintDataError) {
-      data = err.data;
-    }
+    const code = getHTTPErrorCode(err);
 
     if (err instanceof IrisAPIError) {
-      data = err.data.data;
+      err.data = err.data.data;
       err.message = err.data.message;
     }
 
-    if (err instanceof IrisServerError) {
-      err.message = 'We are having internal issues. Please bear with us';
+    if (err instanceof IrisServerError || code === 500) {
+      err.original_message = err.message;
+      err.message = "We are having internal issues. Please bear with us";
     }
 
-    res.jSend.error(data, err.message, this.getHTTPErrorCode(err));
+    res.jSend.error(err.data, err.message, code);
     logger.error({ err, res, req });
-  }
-}
+  };
+};

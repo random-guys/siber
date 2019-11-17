@@ -1,6 +1,6 @@
-import Logger from 'bunyan';
-import { NextFunction, Request, Response } from 'express';
-import uuid from 'uuid/v4';
+import Logger from "bunyan";
+import { NextFunction, Request, Response } from "express";
+import uuid from "uuid/v4";
 
 function removeSensitiveData(body: any, props: string[]) {
   const allKeys = Object.keys(body);
@@ -25,7 +25,7 @@ export function createRequestSerializer(...sensitiveProps: string[]) {
       method: req.method,
       url: req.url,
       headers: req.headers,
-      origin_service: req.headers['x-origin-service'],
+      origin_service: req.headers["x-origin-service"],
       remoteAddress: req.connection.remoteAddress,
       remotePort: req.connection.remotePort,
       id: req.id,
@@ -53,7 +53,7 @@ export const resSerializer = (res: Response) => {
  * Extends the standard bunyan error serializer and allows custom fields to be added to the error log
  */
 export const errSerializer = (err: any) => {
-  const { url, data, req, response, config } = err;
+  const { url, data, req, response, config, original_message } = err;
   const bunyanSanitizedError = Logger.stdSerializers.err(err);
   return {
     ...bunyanSanitizedError,
@@ -61,8 +61,9 @@ export const errSerializer = (err: any) => {
     data,
     req,
     config,
+    original_message,
     ...(response &&
-      typeof response === 'object' && {
+      typeof response === "object" && {
         response: {
           config: response.config,
           data: response.data,
@@ -78,12 +79,12 @@ export const errSerializer = (err: any) => {
 export function requestTracker(log: Logger) {
   return (req: Request, _res: Response, next: NextFunction) => {
     // create a request ID for tracking if non exists
-    if (!req.headers['x-request-id']) {
-      req.headers['x-request-id'] = uuid();
+    if (!req.headers["x-request-id"]) {
+      req.headers["x-request-id"] = uuid();
     }
 
     // @ts-ignore because TS can be smarted...maybe
-    req.id = req.headers['x-request-id'];
+    req.id = req.headers["x-request-id"];
 
     // log requests
     log.info({ req });
