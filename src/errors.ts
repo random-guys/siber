@@ -39,7 +39,7 @@ export class BadGatewayError extends ControllerError {
   }
 }
 
-export class GatewayTImeoutError extends ControllerError {
+export class GatewayTimeoutError extends ControllerError {
   constructor(message: string) {
     super(message);
     this.code = HttpStatus.GATEWAY_TIMEOUT;
