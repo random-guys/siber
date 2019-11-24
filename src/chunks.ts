@@ -14,10 +14,7 @@ export interface Right<T> {
 export type Either<T, E> = Right<T> | Left<E>;
 export type Chunk<T, E> = Promise<Either<T, E>>;
 
-export async function sendChunks<T, E>(
-  res: Response,
-  chunks: Chunk<T, E>[]
-): Promise<void> {
+export async function sendChunks<T>(res: Response, chunks: Chunk<T>[]) {
   // start SSE pipeline
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
@@ -30,7 +27,7 @@ export async function sendChunks<T, E>(
   const checkAndClose = () => {
     counter -= 1;
     if (counter === 0) {
-      res.write(patch("close", {}));
+      res.write(patch("close"));
       res.end();
     }
   };
@@ -43,6 +40,10 @@ export async function sendChunks<T, E>(
   });
 }
 
-function patch<T>(event: string, data: T) {
-  return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+function patch<T>(event: string, data?: T) {
+  if (data) {
+    return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  } else {
+    return `event: ${event}\ndata\n\n`;
+  }
 }
