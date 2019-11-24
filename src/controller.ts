@@ -1,19 +1,17 @@
-import {
-  DuplicateModelError,
-  ModelNotFoundError,
-  Query
-} from "@random-guys/bucket";
+import { Query } from "@random-guys/bucket";
 import Logger from "bunyan";
 import { Request, Response } from "express";
-import HttpStatus from "http-status-codes";
 import { injectable, unmanaged } from "inversify";
 import pick from "lodash/pick";
-import { ConstraintDataError } from "./errors";
-import { IrisAPIError, IrisServerError } from "@random-guys/iris";
+import { Chunk, sendChunks } from "./chunks";
 
 @injectable()
 export class Controller<T> {
   constructor(@unmanaged() private logger: Logger) {}
+
+  async sendAllChunks(req: Request, res: Response, chunks: Chunk<T>[]) {
+    sendChunks(this.logger, req, res, chunks);
+  }
 
   /**
    * Handles operation success and sends a HTTP response.
