@@ -16,13 +16,15 @@ export class Controller<T> {
   constructor(@unmanaged() private logger: Logger) {}
 
   /**
-   * Handles operation success and sends a HTTP response
+   * Handles operation success and sends a HTTP response.
+   * __Note__: if the data passed is a promise, no value is sent
+   * until the promise resolves.
    * @param req Express request
    * @param res Express response
    * @param data Success data
    */
-  handleSuccess(req: Request, res: Response, data: T) {
-    res.jSend.success(data);
+  async handleSuccess(req: Request, res: Response, data: T | Promise<T>) {
+    res.jSend.success(await data);
     this.logger.info({ req, res });
   }
 
