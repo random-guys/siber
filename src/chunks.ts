@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { ControllerError } from "./errors";
 
 export interface Left<E> {
   type: "error";
@@ -11,11 +12,11 @@ export interface Right<T> {
 }
 
 export type Either<T, E> = Right<T> | Left<E>;
-export type PendingResult<T, E> = Promise<Either<T, E>>;
+export type Chunk<T, E> = Promise<Either<T, E>>;
 
 export async function sendChunks<T, E>(
   res: Response,
-  chunks: PendingResult<T, E>[]
+  chunks: Chunk<T, E>[]
 ): Promise<void> {
   // start SSE pipeline
   res.writeHead(200, {
