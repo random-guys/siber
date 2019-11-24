@@ -1,18 +1,6 @@
 import { Response } from "express";
-import { ControllerError } from "./errors";
 
-export interface Left<E> {
-  type: "error";
-  value: E;
-}
-
-export interface Right<T> {
-  type: "success";
-  value: T;
-}
-
-export type Either<T, E> = Right<T> | Left<E>;
-export type Chunk<T, E> = Promise<Either<T, E>>;
+export type Chunk<T> = Promise<T>;
 
 export async function sendChunks<T>(res: Response, chunks: Chunk<T>[]) {
   // start SSE pipeline
@@ -33,9 +21,12 @@ export async function sendChunks<T>(res: Response, chunks: Chunk<T>[]) {
   };
 
   // run in parallel
-  chunks.forEach(async result => {
-    const { type, value } = await result;
-    res.write(patch(type, value));
+  chunks.forEach(async chunk => {
+    try {
+      res.write(patch("success", await chunk));
+    } catch (err) {
+      res.write(patch("error", err.message));
+    }
     checkAndClose();
   });
 }
