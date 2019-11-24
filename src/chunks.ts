@@ -20,13 +20,21 @@ export async function sendChunks<T>(
 
   // create tracker
   let counter = chunks.length;
-  const checkAndClose = () => {
+  const checkAndClose = (handle: NodeJS.Timeout) => {
     counter -= 1;
     if (counter === 0) {
       res.write(patch("close"));
       res.end();
+      clearInterval(handle);
+      logger.info({ req }, "Closed SSE stream");
     }
   };
+
+  // keep connection alive
+  const handle = setInterval(() => {
+    res.write(":");
+    logger.info({ req }, "Sent keep-alive message");
+  }, 3000);
 
   // run in parallel
   chunks.forEach(async chunk => {
@@ -37,7 +45,7 @@ export async function sendChunks<T>(
       res.write(patch("error", err.message));
       logger.info({ req, err }, "Sending error event");
     }
-    checkAndClose();
+    checkAndClose(handle);
   });
 }
 
