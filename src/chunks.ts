@@ -33,7 +33,8 @@ export async function sendChunks<T>(res: Response, chunks: Chunk<T>[]) {
 
 function patch<T>(event: string, data?: T) {
   if (data) {
-    return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    const eventData = typeof data === "string" ? data : JSON.stringify(data);
+    return `event: ${event}\ndata: ${eventData}\n\n`;
   } else {
     return `event: ${event}\ndata\n\n`;
   }
