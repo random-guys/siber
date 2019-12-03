@@ -17,6 +17,7 @@ declare global {
 
     export interface Response {
       jSend: JSendContract;
+      body: any;
     }
   }
 }
