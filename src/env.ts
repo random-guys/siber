@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import mapKeys from "lodash/mapKeys";
 import { parseError } from "./validate";
 
+const trimmedString = joi.string().trim();
+const trimmedRequiredString = trimmedString.required();
+
 export class IncompleteEnvError extends Error {
   constructor(error: ValidationError) {
     const parsedError = parseError(error);
@@ -57,10 +60,9 @@ function validateConfig<T extends AppConfig>(
  * Basic configuration used by all services
  */
 const basicSiberConfig = {
-  api_version: joi.string().default("/api/v1"),
-  auth_scheme: joi.string().required(),
-  node_env: joi
-    .string()
+  api_version: trimmedString.default("/api/v1"),
+  auth_scheme: trimmedRequiredString,
+  node_env: trimmedString
     .valid("dev", "test", "production", "staging")
     .default("dev"),
   is_production: joi.when("node_env", {
@@ -69,11 +71,8 @@ const basicSiberConfig = {
     otherwise: joi.boolean().default(true)
   }),
   port: joi.number().required(),
-  service_name: joi.string().required(),
-  service_secret: joi
-    .string()
-    .required()
-    .min(32)
+  service_name: trimmedRequiredString,
+  service_secret: trimmedRequiredString.min(32)
 };
 
 /**
@@ -91,8 +90,8 @@ export function siberConfig(schema: SchemaMap) {
 export function optionalForDev() {
   return joi.when("node_env", {
     is: joi.valid("production", "staging"),
-    then: joi.string().required(),
-    otherwise: joi.string()
+    then: trimmedRequiredString,
+    otherwise: trimmedString
   });
 }
 
@@ -100,7 +99,7 @@ export function optionalForDev() {
  * Schema for validating mongo configuration
  */
 export const mongoConfig = {
-  mongodb_url: joi.string().required(),
+  mongodb_url: trimmedRequiredString,
   mongodb_username: optionalForDev(),
   mongodb_password: optionalForDev()
 };
@@ -109,7 +108,7 @@ export const mongoConfig = {
  * Schema for validating redis configuration
  */
 export const redisConfig = {
-  redis_url: joi.string().required(),
+  redis_url: trimmedRequiredString,
   redis_password: optionalForDev()
 };
 
