@@ -82,9 +82,9 @@ export class ConflictError extends ControllerError {
  * a `iris` error. Returns `500` otherwise
  * @param err error to parse
  */
-export function getHTTPErrorCode(err: any) {
+export function isInvalidHTTPCode(err: any) {
   // check if error code exists and is a valid HTTP code.
-  if (err.code >= 100 && err.code < 600) return err.code;
+  if (err.code < 100 || err.code > 600) return err.code;
 
   // integration with bucket
   if (err instanceof ModelNotFoundError) return HttpStatus.NOT_FOUND;
@@ -122,7 +122,15 @@ export function universalErrorHandler(
       err = interpreter(err);
     }
 
-    const code = getHTTPErrorCode(err);
+    // exit early when we don't understand it
+    if (!(err instanceof ControllerError)) {
+      logger.error({ err, res, req });
+      return res.jSend.error(
+        null,
+        "We are having internal issues. Please bear with us",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
 
     if (err instanceof IrisAPIError) {
       err.data = err.data.data;
@@ -130,11 +138,11 @@ export function universalErrorHandler(
     }
 
     if (err instanceof IrisServerError || code === 500) {
-      err.original_message = err.message;
+      // err.original_message = err.message;
       err.message = "We are having internal issues. Please bear with us";
     }
 
-    res.jSend.error(err.data, err.message, code);
+    res.jSend.error(err["data"], err.message, err.code);
     logger.error({ err, res, req });
   };
 }
