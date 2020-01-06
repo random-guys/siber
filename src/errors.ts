@@ -1,5 +1,3 @@
-import { DuplicateModelError, ModelNotFoundError } from "@random-guys/bucket";
-import { IrisAPIError, IrisServerError } from "@random-guys/iris";
 import Logger from "bunyan";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
