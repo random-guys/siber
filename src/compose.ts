@@ -29,10 +29,17 @@ export function composeE(...handlers: Interpreter[]): Interpreter {
   };
 }
 
+/**
+ * Recursively try the functions passed to it till one returns a
+ * `ControllerError` else return null.
+ * @param err error to interpret
+ * @param fns interpreters to try
+ */
 function tryFunctions(err: Error, [f, ...fs]: Interpreter[]) {
+  if (!f) return null;
+
   const intrp = f(err);
-  if (intrp instanceof ControllerError) {
-    return intrp;
-  }
+  if (intrp != null) return intrp;
+
   return tryFunctions(err, fs);
 }
