@@ -1,6 +1,6 @@
 {
   "name": "@random-guys/siber",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Controllers as classes... with batteries 😬",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,8 +36,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@random-guys/bucket": "^0.7.0",
-    "@random-guys/iris": "^1.1.0",
+    "@random-guys/bucket": "^0.7.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
