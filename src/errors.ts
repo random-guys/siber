@@ -3,6 +3,7 @@ import { IrisAPIError, IrisServerError } from "@random-guys/iris";
 import Logger from "bunyan";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
+import { Interpreter } from "./compose";
 
 export class ControllerError extends Error {
   code: number;
@@ -93,17 +94,26 @@ export function getHTTPErrorCode(err: any) {
 }
 
 /**
- * A error general handler that handles:
- * - any `ControllerError`
- * - `bucket` errors
- * - `iris` errors
- * @param logger Logger to log errors and their corresponding request/response pair
+ * A global error handler for an entire app. If the error passed is an instance
+ * of `ControllerError` it will return its correpsonding code, otherwise it returns
+ * `500` and logs the original error
+ * @param logger Logger to log errors and their corresponding
+ * request/response pair
+ * @param interpreter function to convert errors form libraries
+ * into `ControllerError`
  */
-export const universalErrorHandler = (logger: Logger): ErrorRequestHandler => {
+export function universalErrorHandler(
+  logger: Logger,
+  interpreter?: Interpreter
+): ErrorRequestHandler {
   // useful when we have call an asynchrous function that might throw
   // after we've sent a response to client
   return async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
+
+    if (interpreter) {
+      err = interpreter(err);
+    }
 
     const code = getHTTPErrorCode(err);
 
@@ -120,4 +130,4 @@ export const universalErrorHandler = (logger: Logger): ErrorRequestHandler => {
     res.jSend.error(err.data, err.message, code);
     logger.error({ err, res, req });
   };
-};
+}
