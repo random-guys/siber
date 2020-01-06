@@ -6,64 +6,64 @@ import HttpStatus from "http-status-codes";
 import { Interpreter } from "./compose";
 
 export class ControllerError extends Error {
-  code: number;
+  readonly code: number;
   constructor(message: string) {
     super(message);
   }
 }
 
 export class ServerError extends ControllerError {
+  code = HttpStatus.INTERNAL_SERVER_ERROR;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.INTERNAL_SERVER_ERROR;
   }
 }
 
 export class ForbiddenError extends ControllerError {
+  code = HttpStatus.FORBIDDEN;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.FORBIDDEN;
   }
 }
 
 export class BadRequestError extends ControllerError {
+  code = HttpStatus.BAD_REQUEST;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.BAD_REQUEST;
   }
 }
 
 export class BadGatewayError extends ControllerError {
+  code = HttpStatus.BAD_GATEWAY;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.BAD_GATEWAY;
   }
 }
 
 export class GatewayTimeoutError extends ControllerError {
+  code = HttpStatus.GATEWAY_TIMEOUT;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.GATEWAY_TIMEOUT;
   }
 }
 
 export class NotFoundError extends ControllerError {
+  code = HttpStatus.NOT_FOUND;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.NOT_FOUND;
   }
 }
 
 export class ConstraintError extends ControllerError {
+  code = HttpStatus.UNPROCESSABLE_ENTITY;
   constructor(message: string) {
     super(message);
-    this.code = HttpStatus.UNPROCESSABLE_ENTITY;
   }
 }
 
 export class ConstraintDataError extends ControllerError {
-  readonly data: any;
   code = HttpStatus.UNPROCESSABLE_ENTITY;
+  readonly data: any;
   constructor(message: string, data: any) {
     super(message);
     this.data = data;
