@@ -70,6 +70,13 @@ export class ConstraintDataError extends ControllerError {
   }
 }
 
+export class ConflictError extends ControllerError {
+  code = HttpStatus.CONFLICT;
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 /**
  * Get the HTTP code for an error that has a prop `code`,or is a `bucket`error, or
  * a `iris` error. Returns `500` otherwise
