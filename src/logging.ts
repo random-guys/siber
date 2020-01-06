@@ -45,7 +45,8 @@ export const resSerializer = (res: Response) => {
   return {
     statusCode: res.statusCode,
     // @ts-ignore
-    headers: res._headers
+    headers: res._headers,
+    body: res.body
   };
 };
 
