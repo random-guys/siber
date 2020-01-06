@@ -21,8 +21,8 @@ export class Controller<T> {
    * @param res Express response
    * @param data Success data
    */
-  async handleSuccess(req: Request, res: Response, data: T | Promise<T>) {
-    res.jSend.success(await data);
+  async handleSuccess(req: Request, res: Response, data: T) {
+    res.jSend.success(data);
     this.logger.info({ req, res });
   }
 
