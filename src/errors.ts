@@ -94,7 +94,7 @@ export function universalErrorHandler(
     if (res.headersSent) return next(err);
 
     if (interpreter) {
-      err = interpreter(err);
+      err = interpreter(err) || err;
     }
 
     // exit early when we don't understand it
