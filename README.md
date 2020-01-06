@@ -1,13 +1,12 @@
 # siber
 
-Controllers as classes..I really can't explain beyond this
+Controllers as classes. This lib abstracts away the internals of controllers.
 
 ## How to install?
 
 `yarn add @random-guys/siber`
 
-Also, you need
-`yarn add inversify-express-utils`
+Also, you need `yarn add inversify-express-utils`
 
 ## How does it work?
 
