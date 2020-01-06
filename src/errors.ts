@@ -3,8 +3,15 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
 import { Interpreter } from "./compose";
 
+/**
+ * Base error type for errors that the server can respond
+ * with.
+ */
 export class ControllerError extends Error {
-  readonly code: number;
+  /**
+   * HTTP status code for this error
+   */
+  code: number;
   constructor(message: string) {
     super(message);
   }
