@@ -45,7 +45,8 @@ export const resSerializer = (res: Response) => {
   return {
     statusCode: res.statusCode,
     // @ts-ignore
-    headers: res._headers
+    headers: res._headers,
+    body: res.body
   };
 };
 
@@ -53,7 +54,7 @@ export const resSerializer = (res: Response) => {
  * Extends the standard bunyan error serializer and allows custom fields to be added to the error log
  */
 export const errSerializer = (err: any) => {
-  const { url, data, req, response, config, original_message } = err;
+  const { url, data, req, response, config } = err;
   const bunyanSanitizedError = Logger.stdSerializers.err(err);
   return {
     ...bunyanSanitizedError,
@@ -61,7 +62,6 @@ export const errSerializer = (err: any) => {
     data,
     req,
     config,
-    original_message,
     ...(response &&
       typeof response === "object" && {
         response: {

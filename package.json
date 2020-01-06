@@ -1,13 +1,13 @@
 {
   "name": "@random-guys/siber",
-  "version": "0.9.0",
-  "description": "Wrapper around axios for interservice communication",
+  "version": "0.10.0",
+  "description": "Controllers as classes... with batteries 😬",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "watch": "tsc -w -p ./tsconfig.json",
-    "test": "jest --detectOpenHandles --runInBand --forceExit"
+    "test": "jest --runInBand"
   },
   "license": "MIT",
   "repository": {
@@ -29,21 +29,20 @@
     "@types/response-time": "^2.3.3",
     "@types/supertest": "^2.0.7",
     "@types/uuid": "^3.4.5",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@random-guys/bucket": "^0.7.0",
-    "@random-guys/iris": "^1.1.0",
+    "@random-guys/bucket": "^0.7.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "http-status-codes": "^1.3.2",
+    "http-status-codes": "^1.4.0",
     "inversify": "^5.0.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "response-time": "^2.3.2",
     "uuid": "^3.3.3"
   },
