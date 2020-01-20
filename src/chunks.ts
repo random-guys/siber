@@ -1,8 +1,16 @@
-import { Request, Response } from "express";
 import Logger from "bunyan";
+import { EventEmitter } from "events";
+import { Request, Response } from "express";
 
 export type Chunk<T> = Promise<T>;
 
+/**
+ * Send a list of `Chunk`(promise of value) using SSE
+ * @param logger bunyan logger to track the state of the response
+ * @param req express request
+ * @param res express response
+ * @param chunks list of chunks
+ */
 export async function sendChunks<T>(
   logger: Logger,
   req: Request,
@@ -56,4 +64,49 @@ function patch<T>(event: string, data?: T) {
   } else {
     return `event: ${event}\ndata\n\n`;
   }
+}
+
+/**
+ * Proxy `source` events from `emitter` to `destination` over SSE.
+ * @param req express Request
+ * @param res express Response
+ * @param emitter the event emitter to listen on
+ * @param source the event to listen to
+ * @param destination the event to emit
+ */
+export function proxy<T>(
+  logger: Logger,
+  req: Request,
+  res: Response,
+  emitter: EventEmitter,
+  source: string,
+  destination: string
+) {
+  // keep connection alive
+  const handle = setInterval(() => {
+    res.write(":");
+    logger.info({ req }, "Sent keep-alive message");
+  }, 3000);
+
+  const handler = (e: T) => {
+    patch(destination, e);
+    logger.info({ req, data: e }, `Sending ${destination} event`);
+  };
+
+  // start SSE pipeline
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+
+  logger.info({ req, res }, "Started SSE stream");
+
+  res.on("close", () => {
+    emitter.removeListener(source, handler);
+    clearInterval(handle);
+    logger.info({ req }, "Cleaned up SSE");
+  });
+
+  emitter.on(source, handler);
 }
