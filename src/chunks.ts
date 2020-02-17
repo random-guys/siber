@@ -40,7 +40,7 @@ export async function sendChunks<T>(
 
   // keep connection alive
   const handle = setInterval(() => {
-    res.write(":");
+    res.write(":\n\n");
     logger.info({ req }, "Sent keep-alive message");
   }, 3000);
 
@@ -84,7 +84,7 @@ export function proxy<T>(
 ) {
   // keep connection alive
   const handle = setInterval(() => {
-    res.write(":");
+    res.write(":\n\n");
     logger.info({ req }, "Sent keep-alive message");
   }, 3000);
 
