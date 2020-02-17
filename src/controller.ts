@@ -3,14 +3,39 @@ import Logger from "bunyan";
 import { Request, Response } from "express";
 import { injectable, unmanaged } from "inversify";
 import pick from "lodash/pick";
-import { Chunk, sendChunks } from "./chunks";
+import { Chunk, sendChunks, proxy } from "./chunks";
+import { EventEmitter } from "events";
 
 @injectable()
 export class Controller<T> {
   constructor(@unmanaged() private logger: Logger) {}
 
+  /**
+   * Send a list of `Chunk`(promise of value) using SSE
+   * @param req express request
+   * @param res express response
+   * @param chunks list of chunks
+   */
   async sendAllChunks(req: Request, res: Response, chunks: Chunk<T>[]) {
     sendChunks(this.logger, req, res, chunks);
+  }
+
+  /**
+   * Proxy events from an event emitter to a client using SSE
+   * @param req express Request
+   * @param res express Response
+   * @param emitter the event emitter to listen on
+   * @param source source event on the `EventEmitter`
+   * @param dest destination event to use with SSE.
+   */
+  async proxyFrom(
+    req: Request,
+    res: Response,
+    emitter: EventEmitter,
+    source: string,
+    dest: string
+  ) {
+    proxy(this.logger, req, res, emitter, source, dest);
   }
 
   /**

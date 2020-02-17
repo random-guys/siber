@@ -100,7 +100,7 @@ export function universalErrorHandler(
   return async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
 
-    if (interpreter) {
+    if (interpreter && !(err instanceof ControllerError)) {
       err = interpreter(err) || err;
     }
 
