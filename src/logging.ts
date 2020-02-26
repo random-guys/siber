@@ -75,20 +75,30 @@ export const errSerializer = (err: any) => {
   };
 };
 
+function hasUserAgent(req: Request, ignore: RegExp[]) {
+  return ignore.some(x => {
+    x.test(req.headers["user-agent"]);
+  });
+}
+
 /**
  * Express Middleware that logs incoming HTTP requests.
  */
-export function requestTracker(log: Logger): RequestHandler {
+export function requestTracker(log: Logger, ignore = []): RequestHandler {
   return (req: Request, _res: Response, next: NextFunction) => {
     // create a request ID for tracking if non exists
     if (!req.headers["x-request-id"]) {
       req.headers["x-request-id"] = uuid();
     }
 
-    // @ts-ignore because TS can be smarted...maybe
+    // @ts-ignore because TS can be smarter...maybe
     req.id = req.headers["x-request-id"];
 
-    // log requests
+    // ignore some user agents
+    if (hasUserAgent(req, ignore)) {
+      return next();
+    }
+
     log.info({ req });
 
     // c'est fini
