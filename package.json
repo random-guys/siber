@@ -1,6 +1,6 @@
 {
   "name": "@random-guys/siber",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Controllers as classes... with batteries 😬",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
