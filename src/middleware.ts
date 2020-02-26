@@ -7,7 +7,9 @@ import { refreshJSend } from "./jsend";
 
 export interface SiberConfig {
   cors: boolean | CorsOptions;
-  tracking: boolean;
+  tracking: {
+    excludeAgents?: RegExp[];
+  };
 }
 
 export function build(app: Application, logger: Logger, conf: SiberConfig) {
@@ -31,7 +33,7 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
 
   // logging and metrics
   if (conf.tracking) {
-    app.use(requestTracker(logger));
+    app.use(requestTracker(logger, conf.tracking.excludeAgents));
     app.use(responseTime());
   }
 }
