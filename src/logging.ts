@@ -76,9 +76,7 @@ export const errSerializer = (err: any) => {
 };
 
 function hasUserAgent(req: Request, ignore: RegExp[]) {
-  return ignore.some(x => {
-    x.test(req.headers["user-agent"]);
-  });
+  return ignore.some(x => x.test(req.headers["user-agent"]));
 }
 
 /**
