@@ -17,6 +17,8 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(refreshJSend);
+  app.use(requestTracker(logger, conf.tracking.excludeAgents));
+  app.use(responseTime());
 
   // CORS
   if (conf.cors) {
@@ -29,11 +31,5 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
 
     app.use(cors(conf.cors));
     app.options("*", cors(conf.cors));
-  }
-
-  // logging and metrics
-  if (conf.tracking) {
-    app.use(requestTracker(logger, conf.tracking.excludeAgents));
-    app.use(responseTime());
   }
 }
