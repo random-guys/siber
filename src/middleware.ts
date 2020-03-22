@@ -8,7 +8,11 @@ import { refreshJSend } from "./jsend";
 const kubernetesAgents = [/kube-probe/i, /Prometheus/i];
 
 export interface SiberConfig {
-  cors: boolean | CorsOptions;
+  /**
+   * domains beyond localhost, that can make CORS requests to this service(
+   * even with credentials). Note that without this cors would be disabled entirely
+   */
+  cors_domains?: string | string[];
   /**
    * whether or not to log kube-proxy and prometheus user agents. Defaults
    * to false.
@@ -36,15 +40,17 @@ export function build(app: Application, logger: Logger, conf: SiberConfig) {
   app.use(responseTime());
 
   // CORS
-  if (conf.cors) {
-    if (typeof conf.cors === "boolean") {
-      conf.cors = {
-        origin: true,
-        credentials: true
-      };
-    }
+  if (conf.cors_domains) {
+    const domains = Array.isArray(conf.cors_domains)
+      ? conf.cors_domains
+      : [conf.cors_domains];
 
-    app.use(cors(conf.cors));
-    app.options("*", cors(conf.cors));
+    const corsConf = {
+      origin: [/localhost/, ...domains.map(domain => new RegExp(`${domain}$`))],
+      credentials: true
+    };
+
+    app.use(cors(corsConf));
+    app.options("*", cors(corsConf));
   }
 }
