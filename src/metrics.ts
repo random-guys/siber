@@ -4,7 +4,7 @@ import { AppConfig } from "./env";
 
 export class SiberMetrics {
   private histogram: client.Histogram<"method" | "statusCode" | "path">;
-  private register: client.Registry;
+  readonly register: client.Registry;
 
   constructor(config: AppConfig) {
     this.register = new client.Registry();
