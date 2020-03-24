@@ -25,7 +25,21 @@ export interface SiberConfig {
   excludeAgents?: RegExp[];
 }
 
-export function build(app: Application, logger: Logger, conf: SiberConfig) {
+/**
+ * Configure an express application with:
+ * - JSON/URLEncoded request parsing
+ * - JSend methods for requests
+ * - Request Logging and response time tracking
+ * - CORS
+ * @param app express application to configure
+ * @param logger logger for request logging
+ * @param conf siber configuration
+ */
+export function build(
+  app: Application,
+  logger: Logger,
+  conf: SiberConfig = {}
+) {
   // default middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
