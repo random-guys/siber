@@ -1,14 +1,18 @@
 import { Query } from "@random-guys/bucket";
 import Logger from "bunyan";
+import { EventEmitter } from "events";
 import { Request, Response } from "express";
 import { injectable, unmanaged } from "inversify";
 import pick from "lodash/pick";
-import { Chunk, sendChunks, proxy } from "./chunks";
-import { EventEmitter } from "events";
+import { Chunk, proxy, sendChunks } from "./chunks";
+import { SiberMetrics } from "./metrics";
 
 @injectable()
 export class Controller<T> {
-  constructor(@unmanaged() private logger: Logger) {}
+  constructor(
+    @unmanaged() private logger: Logger,
+    @unmanaged() private metrics?: SiberMetrics
+  ) {}
 
   /**
    * Send a list of `Chunk`(promise of value) using SSE
@@ -49,6 +53,7 @@ export class Controller<T> {
   async handleSuccess(req: Request, res: Response, data: T) {
     res.jSend.success(data);
     this.logger.info({ req, res });
+    this.metrics.record(req, res);
   }
 
   /**
