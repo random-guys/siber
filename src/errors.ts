@@ -2,6 +2,7 @@ import Logger from "bunyan";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
 import { Interpreter } from "./compose";
+import { SiberMetrics } from "./metrics";
 
 /**
  * Base error type for errors that the server can respond
@@ -93,6 +94,7 @@ export class ConflictError extends ControllerError {
  */
 export function universalErrorHandler(
   logger: Logger,
+  metrics?: SiberMetrics,
   interpreter?: Interpreter
 ): ErrorRequestHandler {
   // useful when we have call an asynchrous function that might throw
@@ -116,5 +118,6 @@ export function universalErrorHandler(
 
     res.jSend.error(err["data"], err.message, err.code);
     logger.error({ err, res, req });
+    metrics.record(req, res);
   };
 }
