@@ -4,19 +4,23 @@ import { AppConfig } from "./env";
 
 export class SiberMetrics {
   private histogram: client.Histogram<"method" | "statusCode" | "path">;
+  private register: client.Registry;
 
   constructor(config: AppConfig) {
-    client.register.setDefaultLabels({
+    this.register = new client.Registry();
+
+    this.register.setDefaultLabels({
       service: config.service_name,
       environment: config.node_env
     });
 
-    client.collectDefaultMetrics();
+    client.collectDefaultMetrics({ register: this.register });
 
     this.histogram = new client.Histogram({
       name: "http_request_duration_seconds",
       help: "Duration of HTTP requests in seconds",
-      labelNames: ["method", "statusCode", "path"]
+      labelNames: ["method", "statusCode", "path"],
+      registers: [this.register]
     });
   }
 
@@ -26,8 +30,8 @@ export class SiberMetrics {
    * @param res Express response object
    */
   send(req: Request, res: Response) {
-    res.set("Content-Type", client.register.contentType);
-    res.end(client.register.metrics());
+    res.set("Content-Type", this.register.contentType);
+    res.end(this.register.metrics());
   }
 
   /**
