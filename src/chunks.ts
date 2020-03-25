@@ -71,16 +71,14 @@ function patch<T>(event: string, data?: T) {
  * @param req express Request
  * @param res express Response
  * @param emitter the event emitter to listen on
- * @param source the event to listen to
- * @param destination the event to emit
+ * @param eventMap map of source events to destination events
  */
 export function proxy<T>(
   logger: Logger,
   req: Request,
   res: Response,
   emitter: EventEmitter,
-  source: string,
-  destination: string
+  eventMap: object
 ) {
   // keep connection alive
   const handle = setInterval(() => {
@@ -88,7 +86,7 @@ export function proxy<T>(
     logger.info({ req }, "Sent keep-alive message");
   }, 3000);
 
-  const handler = (e: T) => {
+  const handlerFn = (destination: string) => (e: T) => {
     patch(destination, e);
     logger.info({ req, data: e }, `Sending ${destination} event`);
   };
@@ -103,10 +101,14 @@ export function proxy<T>(
   logger.info({ req, res }, "Started SSE stream");
 
   res.on("close", () => {
-    emitter.removeListener(source, handler);
+    Object.keys(eventMap).forEach(event => {
+      emitter.removeListener(event, handlerFn(eventMap[event]));
+    });
     clearInterval(handle);
     logger.info({ req }, "Cleaned up SSE");
   });
 
-  emitter.on(source, handler);
+  Object.keys(eventMap).forEach(event => {
+    emitter.on(event, handlerFn(eventMap[event]));
+  });
 }
