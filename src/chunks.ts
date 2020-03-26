@@ -83,11 +83,10 @@ export function proxy<T>(
   // keep connection alive
   const handle = setInterval(() => {
     res.write(":\n\n");
-    logger.info({ req }, "Sent keep-alive message");
-  }, 3000);
+  }, 10000);
 
   const handlerFn = (destination: string) => (e: T) => {
-    patch(destination, e);
+    res.write(patch(destination, e));
     logger.info({ req, data: e }, `Sending ${destination} event`);
   };
 
