@@ -73,7 +73,7 @@ function patch<T>(event: string, data?: T) {
  * @param emitter the event emitter to listen on
  * @param eventMap map of source events to destination events
  */
-export function proxy<T>(
+export function proxy(
   logger: Logger,
   req: Request,
   res: Response,
@@ -85,7 +85,7 @@ export function proxy<T>(
     res.write(":\n\n");
   }, 10000);
 
-  const handlerFn = (destination: string) => (e: T) => {
+  const handlerFn = (destination: string) => (e: any) => {
     res.write(patch(destination, e));
     logger.info({ req, data: e }, `Sending ${destination} event`);
   };
