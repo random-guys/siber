@@ -29,17 +29,15 @@ export class Controller<T> {
    * @param req express Request
    * @param res express Response
    * @param emitter the event emitter to listen on
-   * @param source source event on the `EventEmitter`
-   * @param dest destination event to use with SSE.
+   * @param eventMap map of source events to destination events
    */
-  async proxyFrom(
+  proxyFrom(
     req: Request,
     res: Response,
     emitter: EventEmitter,
-    source: string,
-    dest: string
+    eventMap: object
   ) {
-    proxy(this.logger, req, res, emitter, source, dest);
+    return proxy(this.logger, req, res, emitter, eventMap);
   }
 
   /**
