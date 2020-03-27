@@ -2,9 +2,17 @@ import Logger from "bunyan";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
 import { Interpreter } from "./compose";
+import { SiberMetrics } from "./metrics";
 
+/**
+ * Base error type for errors that the server can respond
+ * with.
+ */
 export class ControllerError extends Error {
-  readonly code: number;
+  /**
+   * HTTP status code for this error
+   */
+  code: number;
   constructor(message: string) {
     super(message);
   }
@@ -86,6 +94,7 @@ export class ConflictError extends ControllerError {
  */
 export function universalErrorHandler(
   logger: Logger,
+  metrics?: SiberMetrics,
   interpreter?: Interpreter
 ): ErrorRequestHandler {
   // useful when we have call an asynchrous function that might throw
@@ -93,8 +102,8 @@ export function universalErrorHandler(
   return async (err: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(err);
 
-    if (interpreter) {
-      err = interpreter(err);
+    if (interpreter && !(err instanceof ControllerError)) {
+      err = interpreter(err) || err;
     }
 
     // exit early when we don't understand it
@@ -109,5 +118,6 @@ export function universalErrorHandler(
 
     res.jSend.error(err["data"], err.message, err.code);
     logger.error({ err, res, req });
+    metrics.record(req, res);
   };
 }

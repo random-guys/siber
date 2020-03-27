@@ -1,8 +1,16 @@
-import { Request, Response } from "express";
 import Logger from "bunyan";
+import { EventEmitter } from "events";
+import { Request, Response } from "express";
 
 export type Chunk<T> = Promise<T>;
 
+/**
+ * Send a list of `Chunk`(promise of value) using SSE
+ * @param logger bunyan logger to track the state of the response
+ * @param req express request
+ * @param res express response
+ * @param chunks list of chunks
+ */
 export async function sendChunks<T>(
   logger: Logger,
   req: Request,
@@ -32,7 +40,7 @@ export async function sendChunks<T>(
 
   // keep connection alive
   const handle = setInterval(() => {
-    res.write(":");
+    res.write(":\n\n");
     logger.info({ req }, "Sent keep-alive message");
   }, 3000);
 
@@ -56,4 +64,50 @@ function patch<T>(event: string, data?: T) {
   } else {
     return `event: ${event}\ndata\n\n`;
   }
+}
+
+/**
+ * Proxy `source` events from `emitter` to `destination` over SSE.
+ * @param req express Request
+ * @param res express Response
+ * @param emitter the event emitter to listen on
+ * @param eventMap map of source events to destination events
+ */
+export function proxy(
+  logger: Logger,
+  req: Request,
+  res: Response,
+  emitter: EventEmitter,
+  eventMap: object
+) {
+  // keep connection alive
+  const handle = setInterval(() => {
+    res.write(":\n\n");
+  }, 10000);
+
+  const handlerFn = (destination: string) => (e: any) => {
+    res.write(patch(destination, e));
+    logger.info({ req, data: e }, `Sending ${destination} event`);
+  };
+
+  // start SSE pipeline
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+
+  logger.info({ req, res }, "Started SSE stream");
+
+  res.on("close", () => {
+    Object.keys(eventMap).forEach(event => {
+      emitter.removeListener(event, handlerFn(eventMap[event]));
+    });
+    clearInterval(handle);
+    logger.info({ req }, "Cleaned up SSE");
+  });
+
+  Object.keys(eventMap).forEach(event => {
+    emitter.on(event, handlerFn(eventMap[event]));
+  });
 }

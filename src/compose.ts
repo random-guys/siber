@@ -6,7 +6,7 @@ import { ControllerError } from "./errors";
  * passed from left to right
  * @param middleware list of middleware to merge
  */
-export function compose(...middleware: RequestHandler[]) {
+export function compose(...middleware: RequestHandler[]): RequestHandler {
   return middleware.reduce((a, b) => (req, res, next) =>
     a(req, res, err => {
       if (err) return next(err);
@@ -29,10 +29,17 @@ export function composeE(...handlers: Interpreter[]): Interpreter {
   };
 }
 
+/**
+ * Recursively try the functions passed to it till one returns a
+ * `ControllerError` else return null.
+ * @param err error to interpret
+ * @param fns interpreters to try
+ */
 function tryFunctions(err: Error, [f, ...fs]: Interpreter[]) {
+  if (!f) return null;
+
   const intrp = f(err);
-  if (intrp instanceof ControllerError) {
-    return intrp;
-  }
+  if (intrp != null) return intrp;
+
   return tryFunctions(err, fs);
 }

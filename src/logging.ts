@@ -1,5 +1,5 @@
 import Logger from "bunyan";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 import uuid from "uuid/v4";
 
 function removeSensitiveData(body: any, props: string[]) {
@@ -17,7 +17,9 @@ function removeSensitiveData(body: any, props: string[]) {
  * for Bunyan logging
  * @param sensitiveProps key names of sensitive properties
  */
-export function createRequestSerializer(...sensitiveProps: string[]) {
+export function createRequestSerializer(
+  ...sensitiveProps: string[]
+): (req: Request) => object {
   return (req: Request) => {
     if (!req || !req.connection) return req;
 
@@ -73,20 +75,28 @@ export const errSerializer = (err: any) => {
   };
 };
 
+function hasUserAgent(req: Request, ignore: RegExp[]) {
+  return ignore.some(x => x.test(req.headers["user-agent"]));
+}
+
 /**
  * Express Middleware that logs incoming HTTP requests.
  */
-export function requestTracker(log: Logger) {
+export function requestTracker(log: Logger, ignore = []): RequestHandler {
   return (req: Request, _res: Response, next: NextFunction) => {
     // create a request ID for tracking if non exists
     if (!req.headers["x-request-id"]) {
       req.headers["x-request-id"] = uuid();
     }
 
-    // @ts-ignore because TS can be smarted...maybe
+    // @ts-ignore because TS can be smarter...maybe
     req.id = req.headers["x-request-id"];
 
-    // log requests
+    // ignore some user agents
+    if (hasUserAgent(req, ignore)) {
+      return next();
+    }
+
     log.info({ req });
 
     // c'est fini

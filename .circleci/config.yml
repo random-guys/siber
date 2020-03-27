@@ -70,6 +70,7 @@ workflows:
           filters:
             branches:
               ignore:
+                - develop
                 - master
                 - release
       - test:
@@ -78,6 +79,7 @@ workflows:
           filters:
             branches:
               ignore:
+                - develop
                 - master
                 - release
       - deploy:

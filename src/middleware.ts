@@ -5,33 +5,66 @@ import responseTime from "response-time";
 import { requestTracker } from "./logging";
 import { refreshJSend } from "./jsend";
 
+const kubernetesAgents = [/kube-probe/i, /Prometheus/i];
+
 export interface SiberConfig {
-  cors: boolean | CorsOptions;
-  tracking: boolean;
+  /**
+   * domains beyond localhost, that can make CORS requests to this service(
+   * even with credentials). Note that without this cors would be disabled entirely
+   */
+  cors_domains?: string | string[];
+  /**
+   * whether or not to log kube-proxy and prometheus user agents. Defaults
+   * to false.
+   */
+  logKubernetes?: boolean;
+  /**
+   * agents to ignore when logging requests. Excludes kube-probe and Prometheus
+   * unless `logKubernetes` is true.
+   */
+  excludeAgents?: RegExp[];
 }
 
-export function build(app: Application, logger: Logger, conf: SiberConfig) {
+/**
+ * Configure an express application with:
+ * - JSON/URLEncoded request parsing
+ * - JSend methods for requests
+ * - Request Logging and response time tracking
+ * - CORS
+ * @param app express application to configure
+ * @param logger logger for request logging
+ * @param conf siber configuration
+ */
+export function build(
+  app: Application,
+  logger: Logger,
+  conf: SiberConfig = {}
+) {
   // default middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(refreshJSend);
 
-  // CORS
-  if (conf.cors) {
-    if (typeof conf.cors === "boolean") {
-      conf.cors = {
-        origin: true,
-        credentials: true
-      };
-    }
-
-    app.use(cors(conf.cors));
-    app.options("*", cors(conf.cors));
+  conf.excludeAgents = conf.excludeAgents ?? [];
+  if (!conf.logKubernetes) {
+    conf.excludeAgents.push(...kubernetesAgents);
   }
 
-  // logging and metrics
-  if (conf.tracking) {
-    app.use(requestTracker(logger));
-    app.use(responseTime());
+  app.use(requestTracker(logger, conf.excludeAgents));
+  app.use(responseTime());
+
+  // CORS
+  if (conf.cors_domains) {
+    const domains = Array.isArray(conf.cors_domains)
+      ? conf.cors_domains
+      : [conf.cors_domains];
+
+    const corsConf = {
+      origin: [/localhost/, ...domains.map(domain => new RegExp(`${domain}$`))],
+      credentials: true
+    };
+
+    app.use(cors(corsConf));
+    app.options("*", cors(corsConf));
   }
 }
