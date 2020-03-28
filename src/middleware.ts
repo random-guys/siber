@@ -46,7 +46,7 @@ export function build(
   conf: SiberConfig = {}
 ) {
   // default middleware
-  app.use(express.json());
+  app.use(express.json({ limit: conf.requestBodyLimit }));
   app.use(express.urlencoded({ extended: false }));
   app.use(refreshJSend);
 
