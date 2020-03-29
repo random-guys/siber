@@ -25,9 +25,10 @@ export interface SiberConfig {
   excludeAgents?: RegExp[];
 
   /**
-   * Controls the maximum request body size.
+   * Controls the maximum request body size. If this is a number, then the value specifies
+   * the number of bytes; if it is a string, the value is passed to the `bytes` library for parsing.
    */
-  requestBodyLimit?: number
+  requestPostLimit?: number | string;
 }
 
 /**
@@ -46,8 +47,8 @@ export function build(
   conf: SiberConfig = {}
 ) {
   // default middleware
-  app.use(express.json({ limit: conf.requestBodyLimit }));
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json({ limit: conf.requestPostLimit }));
+  app.use(express.urlencoded({ limit: conf.requestPostLimit, extended: false }));
   app.use(refreshJSend);
 
   conf.excludeAgents = conf.excludeAgents ?? [];
