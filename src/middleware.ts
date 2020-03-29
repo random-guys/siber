@@ -12,7 +12,7 @@ export interface SiberConfig {
    * domains beyond localhost, that can make CORS requests to this service(
    * even with credentials). Note that without this cors would be disabled entirely
    */
-  cors_domains?: string | string[];
+  corsDomains?: string | string[];
   /**
    * whether or not to log kube-proxy and prometheus user agents. Defaults
    * to false.
@@ -23,6 +23,12 @@ export interface SiberConfig {
    * unless `logKubernetes` is true.
    */
   excludeAgents?: RegExp[];
+
+  /**
+   * Controls the maximum request body size. If this is a number, then the value specifies
+   * the number of bytes; if it is a string, the value is passed to the `bytes` library for parsing.
+   */
+  requestBodyLimit?: number | string;
 }
 
 /**
@@ -41,8 +47,8 @@ export function build(
   conf: SiberConfig = {}
 ) {
   // default middleware
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json({ limit: conf.requestBodyLimit}));
+  app.use(express.urlencoded({ limit: conf.requestBodyLimit, extended: false }));
   app.use(refreshJSend);
 
   conf.excludeAgents = conf.excludeAgents ?? [];
@@ -54,10 +60,10 @@ export function build(
   app.use(responseTime());
 
   // CORS
-  if (conf.cors_domains) {
-    const domains = Array.isArray(conf.cors_domains)
-      ? conf.cors_domains
-      : [conf.cors_domains];
+  if (conf.corsDomains) {
+    const domains = Array.isArray(conf.corsDomains)
+      ? conf.corsDomains
+      : [conf.corsDomains];
 
     const corsConf = {
       origin: [/localhost/, ...domains.map(domain => new RegExp(`${domain}$`))],
