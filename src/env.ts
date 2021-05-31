@@ -43,7 +43,7 @@ function validateConfig<T extends AppConfig>(
   data: any,
   schema: ObjectSchema
 ): T {
-  const { error, value } = joi.validate(data, schema, {
+  const { error, value } = schema.validate(data, {
     abortEarly: false,
     stripUnknown: true
   });
@@ -157,9 +157,9 @@ export interface RedisConfig {
 /**
  * This is for apps that only need sessions
  */
-export interface SessionedApp extends AppConfig, RedisConfig {}
+export interface SessionedApp extends AppConfig, RedisConfig { }
 
 /**
  * This is for apps that want the full package
  */
-export interface DBApp extends SessionedApp, MongoConfig {}
+export interface DBApp extends SessionedApp, MongoConfig { }
