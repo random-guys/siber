@@ -11,8 +11,9 @@ export function parseError(error: ValidationError) {
   }, {});
 }
 
-function innerValidate(data: any, schema: Schema) {
-  const { error, value } = schema.validate(data, {
+function innerValidate(data: any, schema: SchemaLike) {
+  const mainSChema = joi.compile(schema);
+  const { error, value } = mainSChema.validate(data, {
     abortEarly: false,
     stripUnknown: true
   })
@@ -26,7 +27,7 @@ function innerValidate(data: any, schema: Schema) {
 }
 
 export function validate(
-  schema: Schema,
+  schema: SchemaLike,
   context: ValidationContext = "body"
 ): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
