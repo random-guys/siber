@@ -1,4 +1,4 @@
-import joi, { SchemaLike, ValidationError } from "@hapi/joi";
+import joi, { Schema, SchemaLike, ValidationError } from "@hapi/joi";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ConstraintDataError } from "./errors";
 
@@ -11,11 +11,11 @@ export function parseError(error: ValidationError) {
   }, {});
 }
 
-function innerValidate(data: any, schema: SchemaLike) {
-  const { error, value } = joi.validate(data, schema, {
+function innerValidate(data: any, schema: Schema) {
+  const { error, value } = schema.validate(data, {
     abortEarly: false,
     stripUnknown: true
-  });
+  })
 
   if (!error) return { err: null, value: value };
 
@@ -26,7 +26,7 @@ function innerValidate(data: any, schema: SchemaLike) {
 }
 
 export function validate(
-  schema: SchemaLike,
+  schema: Schema,
   context: ValidationContext = "body"
 ): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
