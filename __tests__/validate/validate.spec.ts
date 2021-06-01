@@ -1,8 +1,8 @@
-import joi from "@hapi/joi";
 import bodyParser from "body-parser";
 import express, { NextFunction, Request, Response } from "express";
 import faker from "faker";
 import { INTERNAL_SERVER_ERROR, OK, UNPROCESSABLE_ENTITY } from "http-status-codes";
+import joi from "joi";
 import supertest, { SuperTest, Test } from "supertest";
 import { ControllerError } from '../../src/errors';
 import { validate } from '../../src/validate';
