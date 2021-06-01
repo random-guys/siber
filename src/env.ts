@@ -1,6 +1,6 @@
-import joi, { ObjectSchema, SchemaMap, ValidationError } from "@hapi/joi";
 import { MongoConfig } from "@random-guys/bucket";
 import dotenv from "dotenv";
+import joi, { ObjectSchema, SchemaMap, ValidationError } from "joi";
 import mapKeys from "lodash/mapKeys";
 import { parseError } from "./validate";
 

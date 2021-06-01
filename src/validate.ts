@@ -1,5 +1,5 @@
-import joi, { Schema, SchemaLike, ValidationError } from "@hapi/joi";
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import joi, { SchemaLike, ValidationError } from "joi";
 import { ConstraintDataError } from "./errors";
 
 export type ValidationContext = "body" | "query" | "params";
