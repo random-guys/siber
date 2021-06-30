@@ -49,6 +49,71 @@ const server = new InversifyExpressServer(container, null);
 })
 ```
 
+## To record metrics in your application
+
+in your server common -> services -> `index.ts` directory, create a new instance of SiberMetrics
+
+```ts
+export const Metrics = new SiberMetrics(env);
+```
+
+Send prometeus metrics, in `app.ts`
+
+```ts
+app.get("/metrics", Metrics.send.bind(Metrics));
+```
+
+in your server base controller inherit the the methods of SiberMetrics
+
+```ts
+export class ProController<T> extends Controller<T> {
+  constructor() {
+    super(Log, Metrics);
+  }
+}
+```
+
+Now you can record your requests metrics directly in your endpoints
+```ts
+this.metrics.record(req, res);
+```
+
+Finally, you can also record errors metric
+
+```ts
+handleError(req: Request, res: Response, err: Error, message?: string) {
+  // your error handling logic here
+
+  Metrics.record(req, res);
+}
+```
+
+## To use siber for your env import
+
+If you want the full package i.e SessionedApp MongoConfig AppConfig and RedisConfig, import DApp otherwise
+import the class or package, you want.
+
+```ts
+import joi from "@hapi/joi";
+import { autoloadEnv, DBApp, mongoConfig, redisConfig, siberConfig } from "@random-guys/siber";
+
+export interface ServerEnv extends DBApp {
+  // environmental values goes here i.e
+  amqp_url: string;
+}
+
+export const env = autoloadEnv<ServerEnv>(
+  siberConfig({
+    // ServerEnv validation goes here
+    ...redisConfig,
+    ...mongoConfig,
+    amqp_url: joi.string().uri().required(),
+  })
+);
+
+you can now have `env.amqp_url`
+```
+
 ## TODO
 
 - [ ] Tests
