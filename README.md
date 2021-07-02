@@ -49,70 +49,61 @@ const server = new InversifyExpressServer(container, null);
 })
 ```
 
-## To record metrics in your application
+## What is SiberMetrics and how it works.
 
-in your server common -> services -> `index.ts` directory, create a new instance of SiberMetrics
+- Record metrics from HTTP Request
+- Metrics exporter
+
+Create an instance of the SiberMetrics in your server:
 
 ```ts
 export const Metrics = new SiberMetrics(env);
 ```
 
-Send prometeus metrics, in `app.ts`
+SiberMetrics allow you to record `success` or `failure` requests. You can either record metrics in your `Controller` or `Error` handler using its `record` method:
+
+```ts
+Metrics.record(req, res);
+```
+
+Also siberMetrics allow the export of all recorded metrics to prometeus server through the `send` method:
+
+Create an HTTP Handler to expose your server metrics to prometeus server.
 
 ```ts
 app.get("/metrics", Metrics.send.bind(Metrics));
 ```
 
-in your server base controller inherit the the methods of SiberMetrics
+## Parsing your environment variables
 
-```ts
-export class ProController<T> extends Controller<T> {
-  constructor() {
-    super(Log, Metrics);
-  }
-}
-```
+Siber `autoloadEnv` function helps to parse and validate server environment variables.
 
-Now you can record your requests metrics directly in your endpoints
-```ts
-this.metrics.record(req, res);
-```
+# Usage
+To use `autoloadEnv` you need to define;
 
-Finally, you can also record errors metric
-
-```ts
-handleError(req: Request, res: Response, err: Error, message?: string) {
-  // your error handling logic here
-
-  Metrics.record(req, res);
-}
-```
-
-## To use siber for your env import
-
-If you want the full package i.e SessionedApp MongoConfig AppConfig and RedisConfig, import DApp otherwise
-import the class or package, you want.
+- The `type` definition of your server environment configurations
+- joi validation schema for the `type` definition
 
 ```ts
 import joi from "@hapi/joi";
-import { autoloadEnv, DBApp, mongoConfig, redisConfig, siberConfig } from "@random-guys/siber";
+import { autoloadEnv, siberConfig, mongoConfig, redisConfig } from "@random-guys/siber";
 
-export interface ServerEnv extends DBApp {
-  // environmental values goes here i.e
-  amqp_url: string;
+interface EnvironmentConfig {
+  any_variable: string
 }
 
-export const env = autoloadEnv<ServerEnv>(
+export const env = autoloadEnv<EnvironmentConfig>(
   siberConfig({
-    // ServerEnv validation goes here
-    ...redisConfig,
     ...mongoConfig,
-    amqp_url: joi.string().uri().required(),
+    ...redisConfig,
+    any_variable: joi.string().required(),
   })
 );
-
-you can now have `env.amqp_url`
 ```
+
+`siberConfig` creates a joi schema to determine and validate the configuration.
+
+PS: `mongoConfig` and `redisConfig` are environment schema object for mongodb and redis.
 
 ## TODO
 
