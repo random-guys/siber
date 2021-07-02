@@ -23,7 +23,7 @@ export class IncompleteEnvError extends Error {
  * keys.
  * @param schema schema to use for validation
  */
-export function autoloadEnv<T extends AppConfig>(schema: ObjectSchema): T {
+export function autoloadEnv<T>(schema: ObjectSchema): T {
   dotenv.config();
   const processedEnv = mapKeys(process.env, (_, key) => {
     return key.toLowerCase();
@@ -39,7 +39,7 @@ export function autoloadEnv<T extends AppConfig>(schema: ObjectSchema): T {
  * @param data env object
  * @param schema schema to use for validation
  */
-function validateConfig<T extends AppConfig>(
+function validateConfig<T>(
   data: any,
   schema: ObjectSchema
 ): T {
