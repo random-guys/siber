@@ -54,7 +54,7 @@ const server = new InversifyExpressServer(container, null);
 - Record metrics from HTTP Request
 - Metrics exporter
 
-Create an instance of the SiberMetrics in your server:
+Use SiberMetrics in your typescript express server by Creating an instance of `SiberMetrics`.
 
 ```ts
 export const Metrics = new SiberMetrics(env);
@@ -66,7 +66,7 @@ SiberMetrics allow you to record `success` or `failure` requests. You can either
 Metrics.record(req, res);
 ```
 
-Also siberMetrics allow the export of all recorded metrics to prometeus server through the `send` method:
+Also SiberMetrics allow the export of all recorded metrics to prometeus server through the `send` method:
 
 Create an HTTP Handler to expose your server metrics to prometeus server.
 
@@ -81,14 +81,14 @@ Siber `autoloadEnv` function helps to parse and validate server environment vari
 # Usage
 To use `autoloadEnv` you need to define;
 
-- The `type` definition of your server environment configurations
+- The `type` definition of your server environment variables
 - joi validation schema for the `type` definition
 
 ```ts
 import joi from "@hapi/joi";
 import { autoloadEnv, siberConfig, mongoConfig, redisConfig } from "@random-guys/siber";
 
-interface EnvironmentConfig {
+interface EnvironmentConfig extends DApp{
   any_variable: string
 }
 
@@ -103,7 +103,7 @@ export const env = autoloadEnv<EnvironmentConfig>(
 
 `siberConfig` creates a joi schema to determine and validate the configuration.
 
-PS: `mongoConfig` and `redisConfig` are environment schema object for mongodb and redis.
+PS: `mongoConfig` and `redisConfig` are environment schema object for mongodb and redis. While `DAPP` is a `type` of all the basic environment variables
 
 ## TODO
 
