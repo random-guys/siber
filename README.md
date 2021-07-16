@@ -51,24 +51,21 @@ const server = new InversifyExpressServer(container, null);
 
 ## What is SiberMetrics and how it works.
 
-- Record metrics from HTTP Request
-- Metrics exporter
+SiberMetrics are routers around prometheus client for node.js to record and export a histogram of an http request.
 
-Use SiberMetrics in your typescript express server by Creating an instance of `SiberMetrics`.
+- Create a global instance of SiberMetrics
 
 ```ts
 export const Metrics = new SiberMetrics(env);
 ```
 
-SiberMetrics allow you to record `success` or `failure` requests. You can either record metrics in your `Controller` or `Error` handler using its `record` method:
+- Record the request after it has been handled
 
 ```ts
 Metrics.record(req, res);
 ```
 
-Also SiberMetrics allow the export of all recorded metrics to prometeus server through the `send` method:
-
-Create an HTTP Handler to expose your server metrics to prometeus server.
+- Create an HTTP Handler to expose your server metrics to prometheus server.
 
 ```ts
 app.get("/metrics", Metrics.send.bind(Metrics));
@@ -78,30 +75,36 @@ app.get("/metrics", Metrics.send.bind(Metrics));
 
 Siber `autoloadEnv` function helps to parse and validate server environment variables.
 
-# Usage
-To use `autoloadEnv` you need to define;
-
-- The `type` definition of your server environment variables
-- joi validation schema for the `type` definition
-
 ```ts
 import joi from "@hapi/joi";
-import { autoloadEnv, siberConfig, mongoConfig, redisConfig } from "@random-guys/siber";
+import { autoloadEnv, siberConfig, mongoConfig, redisConfig, DApp } from "@random-guys/siber";
+```
 
-interface EnvironmentConfig extends DApp{
-  any_variable: string
+- Create a `type` for your environment
+
+```ts
+interface Environment extends DApp {
+  any_key: string
 }
 
-export const env = autoloadEnv<EnvironmentConfig>(
+`siberConfig` return a joi schema of the environment variables.
+
+ siberConfig({
+    ...mongoConfig,
+    ...redisConfig,
+    any_key: joi.string().required(),
+  })
+
+`autoloadEnv` loads the validated environment
+
+export const env = autoloadEnv<Environment>(
   siberConfig({
     ...mongoConfig,
     ...redisConfig,
-    any_variable: joi.string().required(),
+    any_key: joi.string().required(),
   })
 );
 ```
-
-`siberConfig` creates a joi schema to determine and validate the configuration.
 
 PS: `mongoConfig` and `redisConfig` are environment schema object for mongodb and redis. While `DAPP` is a `type` of all the basic environment variables
 
