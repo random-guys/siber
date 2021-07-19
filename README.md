@@ -51,7 +51,7 @@ const server = new InversifyExpressServer(container, null);
 
 ## What is SiberMetrics and how it works.
 
-SiberMetrics are routers around prometheus client for node.js to record and export a histogram of an http request.
+SiberMetrics are wrapper around Prometheus client for Node.js to record and export metrics of an http request.
 
 - Create a global instance of SiberMetrics
 
