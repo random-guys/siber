@@ -49,6 +49,65 @@ const server = new InversifyExpressServer(container, null);
 })
 ```
 
+## What is SiberMetrics and how it works.
+
+SiberMetrics are wrapper around Prometheus client for Node.js to record and export metrics of an http request.
+
+- Create a global instance of SiberMetrics
+
+```ts
+export const Metrics = new SiberMetrics(env);
+```
+
+- Record the request after it has been handled
+
+```ts
+Metrics.record(req, res);
+```
+
+- Create an HTTP Handler to expose your server metrics to prometheus server.
+
+```ts
+app.get("/metrics", Metrics.send.bind(Metrics));
+```
+
+## Parsing your environment variables
+
+Siber `autoloadEnv` function helps to parse and validate server environment variables.
+
+```ts
+import joi from "@hapi/joi";
+import { autoloadEnv, siberConfig, mongoConfig, redisConfig, DApp } from "@random-guys/siber";
+```
+
+- Create a `type` for your environment
+
+```ts
+interface Environment extends DApp {
+  any_key: string
+}
+
+`siberConfig` return a joi schema of the environment variables.
+
+ siberConfig({
+    ...mongoConfig,
+    ...redisConfig,
+    any_key: joi.string().required(),
+  })
+
+`autoloadEnv` loads the validated environment
+
+export const env = autoloadEnv<Environment>(
+  siberConfig({
+    ...mongoConfig,
+    ...redisConfig,
+    any_key: joi.string().required(),
+  })
+);
+```
+
+PS: `mongoConfig` and `redisConfig` are environment schema object for mongodb and redis. While `DAPP` is a `type` of all the basic environment variables
+
 ## TODO
 
 - [ ] Tests
